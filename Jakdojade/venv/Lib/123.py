@@ -160,14 +160,8 @@ for i in range (0,len(BothVariantID)):
                     i+=1
 
 print("Nazwa wspolnych linii:",BothVariantLine)
-print(len(BothVariantLine))
-i=0
-j=0
-for i in range (0,len(BothVariantLine)):
-    for j in range (i+1,len(BothVariantLine)):
-        if(BothVariantLine[i]==BothVariantLine[j]):
-            BothVariantLine.remove(BothVariantLine[j])
-print("Nazwa wspolnych linii:",BothVariantLine)
+BothVariantLinev2=list(set(BothVariantLine))
+print("Nazwa wspolnych linii:",BothVariantLinev2)
 
 # Obliczanie ile jest przystankow miedzy punktem A i B
 
