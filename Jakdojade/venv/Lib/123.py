@@ -12,7 +12,7 @@ print("StopID ",start[0],"= ",startID)
 
 print("\nPrzystanek koncowy")
 # koniec=(input(), )
-koniec=("Przybyszewskiego", )
+koniec=("Dworzec Główny Zachód", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
 for rows in przystanek:
     koniecID=rows[0]
@@ -59,9 +59,9 @@ for row in c.fetchall():
     print(row)
 
 
+####################################### GLOWNY PROGRAM ############################################
 
-
-
+#Wyszukiwanie ID przystanku poczatkowego
 print("\n\n\n\nPrzystanek poczatkowy")
 # start=(input(), )
 start=("Politechnika", )
@@ -71,28 +71,107 @@ for rows in przystanek:
 startID=(cos,)
 print("StopID ",start[0],"= ",startID[0])
 
+#Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
 # koniec=(input(), )
-koniec=("Przybyszewskiego", )
+koniec=("Miasteczko Studenckie AGH", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
 for rows in przystanek:
     cos=rows[0]
 koniecID=(cos,)
 print("StopID",koniec[0],"= ",koniecID[0])
 
+#Możliwe punkty zatrzymania autobusow na przystanku poczatkowym
 StartPointID = []
 print("\n StartPointID:")
-c.execute("SELECT ID From Points WHERE StopId=?",startID)
+c.execute("SELECT ID From Points WHERE StopId=?",startID)  #Name - z którego przystanka DODAC!!!
 for rows in przystanek:
     StartPointID.append(rows[0])
 print(StartPointID)
+print(len(StartPointID))
 
+#Możliwe punkty zatrzymania autobusow na przystanku koncowym
 EndPointID = []
 print("\n EndPointID:")
-c.execute("SELECT ID From Points WHERE StopId=?",koniecID)
+c.execute("SELECT ID From Points WHERE StopId=?",koniecID)  #Name - z którego przystanka DODAC!!!
 for rows in przystanek:
     EndPointID.append(rows[0])
 print(EndPointID)
+print(len(EndPointID))
 
+
+#Możliwe sposoby przejazdy linii przez dany przystanek początkowy
+x=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+StartVariantID=[]
+i=0
+print("\nStartVariantID")
+trasa = c.execute("SELECT VariantID FROM StopDepartures WHERE StopID=? order by VariantID",startID)     #POMYSL zmienic startID na pointID
+for row in trasa:
+        if int(x[i])!=int(row[0]):
+            x[i]=row[0]
+            if x[i]!=x[i-1]:
+                StartVariantID.append(row[0])
+                i+=1
+print("StartVariantID = ", StartVariantID)
+print(len(StartVariantID))
+
+#Możliwe sposoby przejazdy linii przez dany przystanek koncowy
+x=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+EndVariantID=[]
+i=0
+print("\nEndVariantID")
+trasa = c.execute("SELECT VariantID FROM StopDepartures WHERE StopID=? order by VariantID",koniecID)    #POMYSL zmienic startID na pointID
+for row in trasa:
+        if int(x[i])!=int(row[0]):
+            x[i]=row[0]
+            if x[i]!=x[i-1]:
+                EndVariantID.append(row[0])
+                i+=1
+print("EndVariantID = ", EndVariantID)
+print(len(EndVariantID))
+
+#Wspolne kombinacje polaczen
+i=0
+j=0
+BothVariantID =[]
+print("\nBothVariantID")
+for i in range(0,len(StartVariantID)):
+    for j in range(0,len(EndVariantID)):
+        if StartVariantID[i]==EndVariantID[j]:
+            BothVariantID.append(StartVariantID[i])
+        j=j+1
+    i=i+1
+print("BothVariantID=",BothVariantID)
+
+#Zamiana ID na nazwe linii
+x=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+BothVariantLine = []
+i=0
+j=0
+print("\nBothVariantLine")
+for i in range (0,len(BothVariantID)):
+    id = (BothVariantID[i],)
+    trasa = c.execute("SELECT * FROM Variants Where ID=?",id)
+    for row in trasa:
+            if int(x[i])!=int(row[1]):
+                x[i]=row[1]
+                if x[i]!=x[i-1]:
+                    BothVariantLine.append(row[1])
+                    i+=1
+
+print("Nazwa wspolnych linii:",BothVariantLine)
+print(len(BothVariantLine))
+i=0
+j=0
+for i in range (0,len(BothVariantLine)):
+    for j in range (i+1,len(BothVariantLine)):
+        if(BothVariantLine[i]==BothVariantLine[j]):
+            BothVariantLine.remove(BothVariantLine[j])
+print("Nazwa wspolnych linii:",BothVariantLine)
+
+# Obliczanie ile jest przystankow miedzy punktem A i B
+
+
+#Zamkniecie
 c.close()
 conn.close()
