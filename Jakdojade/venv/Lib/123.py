@@ -12,7 +12,7 @@ print("StopID ",start[0],"= ",startID)
 
 print("\nPrzystanek koncowy")
 # koniec=(input(), )
-koniec=("Dworzec Główny Zachód", )
+koniec=("Dworzec Główny Wschód", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
 for rows in przystanek:
     koniecID=rows[0]
@@ -33,7 +33,6 @@ i=0
 print("\nWypisuje linie pomiędzy przystankiem Politechnika a końcowym Dworzec Główny Zachód")
 trasa = c.execute("SELECT LineName FROM StopDepartures WHERE StopID=73 and LastStopName=? order by LineName",koniec)
 for row in trasa:
-
         if int(x[i])!=int(row[0]):
             x[i]=row[0]
             if x[i]!=x[i-1]:
@@ -63,8 +62,8 @@ for row in c.fetchall():
 
 #Wyszukiwanie ID przystanku poczatkowego
 print("\n\n\n\nPrzystanek poczatkowy")
-# start=(input(), )
-start=("Politechnika", )
+start=(input(), )
+# start=("Politechnika", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",start)
 for rows in przystanek:
     cos=rows[0]
@@ -73,8 +72,8 @@ print("StopID ",start[0],"= ",startID[0])
 
 #Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
-# koniec=(input(), )
-koniec=("Miasteczko Studenckie AGH", )
+koniec=(input(), )
+# koniec=("Dworzec Główny Zachód", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
 for rows in przystanek:
     cos=rows[0]
@@ -101,32 +100,39 @@ print(len(EndPointID))
 
 
 #Możliwe sposoby przejazdy linii przez dany przystanek początkowy
-x=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+# StartVariantID=[]
+# print("\nStartVariantID")
+# trasa = c.execute("SELECT VariantID FROM StopDepartures WHERE StopID=? order by VariantID",startID)     #POMYSL zmienic startID na pointID
+# for row in trasa:
+#     StartVariantID.append(row[0])
+# StartVariantID=list(set(StartVariantID))
+# print("StartVariantID = ", StartVariantID)
+# print(len(StartVariantID))
+
 StartVariantID=[]
-i=0
 print("\nStartVariantID")
-trasa = c.execute("SELECT VariantID FROM StopDepartures WHERE StopID=? order by VariantID",startID)     #POMYSL zmienic startID na pointID
-for row in trasa:
-        if int(x[i])!=int(row[0]):
-            x[i]=row[0]
-            if x[i]!=x[i-1]:
-                StartVariantID.append(row[0])
-                i+=1
+i=0
+for i in range (0,len(StartPointID)):
+    x=(StartPointID[i], )
+    trasa = c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=? ORDER BY VariantID",x)
+    for row in trasa:
+        StartVariantID.append(row[0])
+StartVariantID=list(set(StartVariantID))
 print("StartVariantID = ", StartVariantID)
 print(len(StartVariantID))
 
+
 #Możliwe sposoby przejazdy linii przez dany przystanek koncowy
-x=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 EndVariantID=[]
 i=0
 print("\nEndVariantID")
-trasa = c.execute("SELECT VariantID FROM StopDepartures WHERE StopID=? order by VariantID",koniecID)    #POMYSL zmienic startID na pointID
-for row in trasa:
-        if int(x[i])!=int(row[0]):
-            x[i]=row[0]
-            if x[i]!=x[i-1]:
-                EndVariantID.append(row[0])
-                i+=1
+for i in range (0,len(EndPointID)):
+    x=(EndPointID[i], )
+    trasa = c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=? ORDER BY VariantID",x)
+    for row in trasa:
+        EndVariantID.append(row[0])
+EndVariantID=list(set(EndVariantID))
 print("EndVariantID = ", EndVariantID)
 print(len(EndVariantID))
 
@@ -144,25 +150,23 @@ for i in range(0,len(StartVariantID)):
 print("BothVariantID=",BothVariantID)
 
 #Zamiana ID na nazwe linii
-x=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 BothVariantLine = []
 i=0
-j=0
 print("\nBothVariantLine")
 for i in range (0,len(BothVariantID)):
     id = (BothVariantID[i],)
     trasa = c.execute("SELECT * FROM Variants Where ID=?",id)
     for row in trasa:
-            if int(x[i])!=int(row[1]):
-                x[i]=row[1]
-                if x[i]!=x[i-1]:
-                    BothVariantLine.append(row[1])
-                    i+=1
+        BothVariantLine.append(row[1])
+    i+=1
 
+BothVariantLine=list(set(BothVariantLine))
 print("Nazwa wspolnych linii:",BothVariantLine)
-BothVariantLinev2=list(set(BothVariantLine))
-print("Nazwa wspolnych linii:",BothVariantLinev2)
+print(len(BothVariantLine) )
 
+i=0
+for i in range(0,len(BothVariantLine)):
+    print(BothVariantLine[i])
 # Obliczanie ile jest przystankow miedzy punktem A i B
 
 
