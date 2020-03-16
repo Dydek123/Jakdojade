@@ -2,60 +2,60 @@ import sqlite3
 conn = sqlite3.connect("rozklady.sqlite3")
 c = conn.cursor()
 
-print("\nPrzystanek poczatkowy")
-# start=(input(), )
-start=("Politechnika", )
-przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",start)
-for rows in przystanek:
-    startID=rows[0]
-print("StopID ",start[0],"= ",startID)
-
-print("\nPrzystanek koncowy")
-# koniec=(input(), )
-koniec=("Dworzec Główny Wschód", )
-przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
-for rows in przystanek:
-    koniecID=rows[0]
-print("StopID",koniec[0],"= ",koniecID)
-
-# print("\nStreetID poczatek")
-# c.execute("SELECT StreetID FROM RRoutes WHERE StopID=73 order by StreetID")
-# print(c.fetchall())
+# print("\nPrzystanek poczatkowy")
+# # start=(input(), )
+# start=("Politechnika", )
+# przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",start)
+# for rows in przystanek:
+#     startID=rows[0]
+# print("StopID ",start[0],"= ",startID)
 #
-# print("\nStreetID koniec")
-# c.execute("SELECT StreetID FROM RRoutes WHERE StopID=81 order by StreetID")
-# print(c.fetchall())
-
-
-x=[0,0,0,0,0,0,0,0,0,0,0,0,0]
-y=[]
-i=0
-print("\nWypisuje linie pomiędzy przystankiem Politechnika a końcowym Dworzec Główny Zachód")
-trasa = c.execute("SELECT LineName FROM StopDepartures WHERE StopID=73 and LastStopName=? order by LineName",koniec)
-for row in trasa:
-        if int(x[i])!=int(row[0]):
-            x[i]=row[0]
-            if x[i]!=x[i-1]:
-                y.append(row[0])
-                i+=1
-print("y = ", y)
-
-
-
-# print("Przystanek poczatkowy")
-# start=(input(),)
-# print("Przystanek koncowy")
-# koniec=(input(),)
+# print("\nPrzystanek koncowy")
+# # koniec=(input(), )
+# koniec=("Dworzec Główny Wschód", )
+# przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
+# for rows in przystanek:
+#     koniecID=rows[0]
+# print("StopID",koniec[0],"= ",koniecID)
 #
-# print("Wypisuje linie i ilosc przystankow pomiędzy przystankiem początkowym a końcowym przystankiem linii")
-# c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName=? and LastStopName=?",{start,koniec})
-# c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName=:start and LastStopName=:koniec",{"start": start, "koniec": koniec})
-
-print("\nWypisuje linie i ilosc przystankow pomiędzy przystankiem Czyżyny Dworzec a końcowym przystankiem Mydlniki")
-c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName='Czyżyny Dworzec' and LastStopName='Mydlniki'")
-print(c.fetchall())
-for row in c.fetchall():
-    print(row)
+# # print("\nStreetID poczatek")
+# # c.execute("SELECT StreetID FROM RRoutes WHERE StopID=73 order by StreetID")
+# # print(c.fetchall())
+# #
+# # print("\nStreetID koniec")
+# # c.execute("SELECT StreetID FROM RRoutes WHERE StopID=81 order by StreetID")
+# # print(c.fetchall())
+#
+#
+# x=[0,0,0,0,0,0,0,0,0,0,0,0,0]
+# y=[]
+# i=0
+# val2 = ["Dworzec Główny Zachód"]
+# val1= (startID,)
+# val1=str(startID)
+# print("\nWypisuje linie pomiędzy przystankiem Politechnika a końcowym Dworzec Główny Zachód")
+# trasa = c.execute('SELECT LineName FROM StopDepartures WHERE StopID='+val1+' and LastStopName=?', val2)
+# for row in trasa:
+#     y.append(row[0])
+# y=list(set(y))
+# print("y = ", y)
+#
+#
+#
+# # print("Przystanek poczatkowy")
+# # start=(input(),)
+# # print("Przystanek koncowy")
+# # koniec=(input(),)
+# #
+# # print("Wypisuje linie i ilosc przystankow pomiędzy przystankiem początkowym a końcowym przystankiem linii")
+# # c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName=? and LastStopName=?",{start,koniec})
+# # c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName=:start and LastStopName=:koniec",{"start": start, "koniec": koniec})
+#
+# print("\nWypisuje linie i ilosc przystankow pomiędzy przystankiem Czyżyny Dworzec a końcowym przystankiem Mydlniki")
+# c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName='Czyżyny Dworzec' and LastStopName='Mydlniki'")
+# print(c.fetchall())
+# for row in c.fetchall():
+#     print(row)
 
 
 ####################################### GLOWNY PROGRAM ############################################
@@ -63,7 +63,7 @@ for row in c.fetchall():
 #Wyszukiwanie ID przystanku poczatkowego
 print("\n\n\n\nPrzystanek poczatkowy")
 start=(input(), )
-# start=("Politechnika", )
+# start=("Biprostal", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",start)
 for rows in przystanek:
     cos=rows[0]
@@ -73,7 +73,7 @@ print("StopID ",start[0],"= ",startID[0])
 #Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
 koniec=(input(), )
-# koniec=("Dworzec Główny Zachód", )
+# koniec=("Krowodrza Górka", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
 for rows in przystanek:
     cos=rows[0]
@@ -167,9 +167,68 @@ print(len(BothVariantLine) )
 i=0
 for i in range(0,len(BothVariantLine)):
     print(BothVariantLine[i])
+
+
 # Obliczanie ile jest przystankow miedzy punktem A i B
 
+print("\nObliczanie ilosci przstankow")
 
+###########################################Start
+for i in range (0,len(StartPointID)):
+    StartPointID[i]=str(StartPointID[i])
+
+for i in range (0,len(BothVariantID)):
+    BothVariantID[i]=str(BothVariantID[i])
+
+No=[]
+for j in range (0,len(BothVariantID)):
+    VariantID=BothVariantID[j]
+    for i in range (0,len(StartPointID)):
+        StartPoint=StartPointID[i]
+        trasa = c.execute("SELECT No FROM Routes WHERE PointID="+StartPoint+" and VariantID="+VariantID)
+        for row in trasa:
+            No.append(row[0])
+# No=No[0]
+print(No)
+###########################################EnD
+for i in range (0,len(EndPointID)):
+    EndPointID[i]=str(EndPointID[i])
+
+No2=[]
+for j in range (0,len(BothVariantID)):
+    VariantID=BothVariantID[j]
+    for i in range (0,len(EndPointID)):
+        EndPoint=EndPointID[i]
+        trasa = c.execute("SELECT No FROM Routes WHERE PointID="+EndPoint+" and VariantID="+VariantID)
+        for row in trasa:
+            No2.append(row[0])
+# No2=No2[0]
+print(No2)
+
+przystankiStart=[]
+przystankiEnd=[]
+
+i=0
+for i in range (0,len(No)):
+    if No2[i]>No[i]:
+        przystankiStart.append(No[i])
+        przystankiEnd.append(No2[i])
+print(przystankiStart)
+print(przystankiEnd)
+
+IloscPrzystankow=[]
+for i in range (0,len(przystankiStart)):
+    IloscPrzystankow.append(przystankiEnd[i]-przystankiStart[i])
+
+wynik=[]
+for i in range (0,len(przystankiEnd)):
+    wynik.append([BothVariantLine[i],IloscPrzystankow[i]])
+
+print("Trasa", start[0] , " - ", koniec[0],": ")
+print("Dostepne linie bezposrednie:")
+i=0
+for i in range(0,len(BothVariantLine)):
+    print("Linia: ",wynik[i][0]," Przystankow: ",wynik[i][1])
 #Zamkniecie
 c.close()
 conn.close()
