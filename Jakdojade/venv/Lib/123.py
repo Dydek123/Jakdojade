@@ -2,66 +2,10 @@ import sqlite3
 conn = sqlite3.connect("rozklady.sqlite3")
 c = conn.cursor()
 
-# print("\nPrzystanek poczatkowy")
-# # start=(input(), )
-# start=("Politechnika", )
-# przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",start)
-# for rows in przystanek:
-#     startID=rows[0]
-# print("StopID ",start[0],"= ",startID)
-#
-# print("\nPrzystanek koncowy")
-# # koniec=(input(), )
-# koniec=("Dworzec Główny Wschód", )
-# przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",koniec)
-# for rows in przystanek:
-#     koniecID=rows[0]
-# print("StopID",koniec[0],"= ",koniecID)
-#
-# # print("\nStreetID poczatek")
-# # c.execute("SELECT StreetID FROM RRoutes WHERE StopID=73 order by StreetID")
-# # print(c.fetchall())
-# #
-# # print("\nStreetID koniec")
-# # c.execute("SELECT StreetID FROM RRoutes WHERE StopID=81 order by StreetID")
-# # print(c.fetchall())
-#
-#
-# x=[0,0,0,0,0,0,0,0,0,0,0,0,0]
-# y=[]
-# i=0
-# val2 = ["Dworzec Główny Zachód"]
-# val1= (startID,)
-# val1=str(startID)
-# print("\nWypisuje linie pomiędzy przystankiem Politechnika a końcowym Dworzec Główny Zachód")
-# trasa = c.execute('SELECT LineName FROM StopDepartures WHERE StopID='+val1+' and LastStopName=?', val2)
-# for row in trasa:
-#     y.append(row[0])
-# y=list(set(y))
-# print("y = ", y)
-#
-#
-#
-# # print("Przystanek poczatkowy")
-# # start=(input(),)
-# # print("Przystanek koncowy")
-# # koniec=(input(),)
-# #
-# # print("Wypisuje linie i ilosc przystankow pomiędzy przystankiem początkowym a końcowym przystankiem linii")
-# # c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName=? and LastStopName=?",{start,koniec})
-# # c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName=:start and LastStopName=:koniec",{"start": start, "koniec": koniec})
-#
-# print("\nWypisuje linie i ilosc przystankow pomiędzy przystankiem Czyżyny Dworzec a końcowym przystankiem Mydlniki")
-# c.execute("SELECT LineName,PointCount FROM Variants WHERE FirstStopName='Czyżyny Dworzec' and LastStopName='Mydlniki'")
-# print(c.fetchall())
-# for row in c.fetchall():
-#     print(row)
-
-
 ####################################### GLOWNY PROGRAM ############################################
 
 #Wyszukiwanie ID przystanku poczatkowego
-print("\n\n\n\nPrzystanek poczatkowy")
+print("Przystanek poczatkowy")
 start=(input(), )
 # start=("Biprostal", )
 przystanek=c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID",start)
@@ -215,6 +159,7 @@ for i in range (0,len(No)):
         przystankiEnd.append(No2[i])
 print(przystankiStart)
 print(przystankiEnd)
+print(len(przystankiEnd))
 
 IloscPrzystankow=[]
 for i in range (0,len(przystankiStart)):
