@@ -172,7 +172,7 @@ for i in range (0,len(przystankiEnd)):
 print("Trasa", start[0] , " - ", koniec[0],": ")
 print("Dostepne linie bezposrednie:")
 i=0
-for i in range(0,len(BothVariantLine)):
+for i in range(0,len(IloscPrzystankow)):    #BothVariantLine?
     print("Linia: ",wynik[i][0]," Przystankow: ",wynik[i][1])
 #Zamkniecie
 c.close()
