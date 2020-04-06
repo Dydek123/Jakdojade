@@ -5,6 +5,28 @@ c = conn.cursor()
 
 
 ####################################### FUNKCJE ##################################################
+
+#########################   GRAF    #########################
+def generujWierzchołkiGrafu():
+    wierzcholki = set()
+    postoj = c.execute("SELECT Id From Points")
+    for rows in postoj:
+        wierzcholki.add(rows[0])
+    return wierzcholki
+
+def generujKrawedzieGrafu():
+    polaczenia = set()  # !!!!!!!!!!!!!!zmienic na set
+    tmp = []
+    postoj = c.execute("SELECT VariantId, No, PointId From Routes")
+    for rows in postoj:
+        tmp.append(rows)
+    print(tmp)
+    for i in range(len(tmp) - 1):
+        if tmp[i][1] < tmp[i + 1][1]:  # and and tmp[i][0]==tmp[i+1][0]
+            polaczenia.add((tmp[i][2], tmp[i + 1][2]))  # zmienic na add
+    return polaczenia
+
+#########################   POLĄCZENIA    #########################
 def sprawdz_ID(przystanek):
     postoj = c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID", przystanek)
     for rows in postoj:
@@ -104,7 +126,7 @@ print("StopID ", start[0], "= ", startID[0])
 #Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
 # koniec=(input(), )
-koniec=("Krowodrza Górka", )
+koniec=("Kawiory", )
 koniecID=(sprawdz_ID(koniec),)
 print("StopID",koniec[0],"= ",koniecID[0])
 
@@ -178,30 +200,80 @@ IloscPrzystankow=ile_przystankow(przystankiStart,przystankiEnd)
 print(IloscPrzystankow)
 ####################################### GENERUJ GRAF   ############################################
 
+
+
 print("\n\n\n")
-g=[]
-g.append(najblizszy_przystanek(StartPointID))
+
+wierzchołki=generujWierzchołkiGrafu()
+print(wierzchołki)
+
+polaczenia=generujKrawedzieGrafu()
+print(polaczenia)
+print(len(polaczenia))
+
+# print("\n\n\n")
+# g=[]
+# n=[]
+# z=[]
+# b=[]
+# PointID=0
 # g.append(najblizszy_przystanek(StartPointID))
-print(g)
-j=0
-for i in EndPointID:
-    while i not in g[0][j][1]:
-        g.append(najblizszy_przystanek(StartPointID))
-        j+=1
-# for i in g:
-#     print(PointID_to_StopName(i[0]),PointID_to_StopName(i[1]))
-print("\n\n\n")
+# print("!!!g1",g,"\n")
+# for i in range (1):
+#     for j in range (len(g[i])):
+#         n.append(g[i][j][1])
+#     for k in n:
+#         print("!!!n", n)
+#         PointID=(n.pop(0),)
+#         z.append(najblizszy_przystanek(PointID))
+#         print("z: ",z)
+#     for a in range (len(z[0])):
+#         b.append([z[0][a][0],z[0][a][1]])
+#     print("!!!!!!!!!",b)
+#     g.append(z)
+#     z=[]
+#     # print("g",k,":",g)
+# print("!!!n",n)
+#
+# print("\n\n\n")
+# g=[]
+# n=[]
+# g.append(najblizszy_przystanek(StartPointID))
+# # g.append(najblizszy_przystanek(StartPointID))
+# print("g: ",g)
+# w=0
+# PointID=StartPointID
+# print("EndPointID: ",EndPointID)
+# for j in range (len(g)):        #Ostatecznie While True:
+#     for i in range (len(g[0])):
+#         n.append(g[j][i][1])
+#         for k in range (len(EndPointID)):
+#             if int(EndPointID[k]) == int(g[0][i][1]):
+#                 w=1
+#                 break
+#     if w==1:
+#         break
+#     PointID=n.pop(0)
+#     g.append(najblizszy_przystanek(PointID))
+#
+# print("g2: ",g)
+# # while x not in g[0][j][1]:
+# #     # g.append(najblizszy_przystanek(StartPointID))
+# #     print(j+1)
+# for i in range (len(g[0])):
+#     print(PointID_to_StopName(g[0][i][0]),PointID_to_StopName(g[0][i][1]))
+# print("\n\n\n")
 
 
 
 ####################################################################    WYPISZ ###############################
-wynik=[[BothVariantLine[i],IloscPrzystankow[i]] for i in range (len(przystankiEnd))]
-
-print("Trasa", start[0] , " - ", koniec[0],": ")
-print("Dostepne linie bezposrednie:")
-i=0
-for i in range(0,len(BothVariantLine)):    #BothVariantLine?
-    print("Linia: ",wynik[i][0]," Przystankow: ",wynik[i][1])
+# wynik=[[BothVariantLine[i],IloscPrzystankow[i]] for i in range (len(przystankiEnd))]
+#
+# print("Trasa", start[0] , " - ", koniec[0],": ")
+# print("Dostepne linie bezposrednie:")
+# i=0
+# for i in range(0,len(BothVariantLine)):    #BothVariantLine?
+#     print("Linia: ",wynik[i][0]," Przystankow: ",wynik[i][1])
 
 
 # Zamkniecie
