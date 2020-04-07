@@ -45,6 +45,7 @@ class Graph:
 
     def bfs2(self, node, queue, visited):
         x = []
+        visited=[]
         s = 0
         visited.append(node)
         queue.append(node)
@@ -74,7 +75,7 @@ class Graph:
 
     def najkrotsza(self, droga, poczatek, koniec):
         droga.reverse()
-        print(droga)
+        # print(droga)
         a=poczatek
         b=koniec
         x = []
@@ -88,11 +89,14 @@ class Graph:
                     if i[0] == koniec:
                         x.append(i[0])
                         break
+                    elif i[1] == 0:
+                        return [-1,0]
                 koniec = i[1]
                 if koniec == poczatek:
                     x.append(koniec)
                     break
             z.append(x)
+        droga.reverse()
         return z
 
 g = Graph()
@@ -130,8 +134,9 @@ bb = []
 z=[]
 x = g.bfs2(84, aa, bb)
 print("\n",x)
-# print(x)
-# naj = g.najkrotsza(x, 84, 63)
-# z=naj[0]
+print(x)
+naj = g.najkrotsza(x, 84, 999)
+print(naj)
+z=naj[0]
 # z.reverse()
-# print(z)
+print(z)

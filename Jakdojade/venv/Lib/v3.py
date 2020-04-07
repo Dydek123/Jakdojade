@@ -1,8 +1,14 @@
 import sqlite3
+from BFS import *
+
 from collections import defaultdict
 conn = sqlite3.connect("rozklady.sqlite3")
 c = conn.cursor()
 
+
+x=321.123
+format(x, "#8.2f")
+print(x)
 
 ####################################### FUNKCJE ##################################################
 
@@ -118,15 +124,15 @@ def najblizszy_przystanek(PointID):
 ####################################### GLOWNY PROGRAM ############################################
 # Wyszukiwanie ID przystanku poczatkowego
 print("Przystanek poczatkowy")
-# start = (input(),)
-start=("Biprostal", )
+start = (input(),)
+# start=("Kawiory", )
 startID=(sprawdz_ID(start),)
 print("StopID ", start[0], "= ", startID[0])
 
 #Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
-# koniec=(input(), )
-koniec=("Kawiory", )
+koniec=(input(), )
+# koniec=("Mazowiecka", )
 koniecID=(sprawdz_ID(koniec),)
 print("StopID",koniec[0],"= ",koniecID[0])
 
@@ -201,7 +207,7 @@ print(IloscPrzystankow)
 ####################################### GENERUJ GRAF   ############################################
 
 
-
+##############  Przed uruchomieniem okna    ##############
 print("\n\n\n")
 
 wierzchołki=generujWierzchołkiGrafu()
@@ -210,6 +216,80 @@ print(wierzchołki)
 polaczenia=generujKrawedzieGrafu()
 print(polaczenia)
 print(len(polaczenia))
+polaczenia=list(polaczenia)
+
+g=Graph()
+for i in range (len(polaczenia)):
+    g.addEdge(polaczenia[i][0],polaczenia[i][1])
+
+##############  Po uruchomieniem okna       ##############
+def rzutujNaInt(lista):
+    for i in range (len(lista)):
+        lista[i]=int(lista[i])
+
+aa = []
+bb = []
+z=[]
+
+print(StartPointID,len(StartPointID))
+
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+rzutujNaInt(StartPointID)
+rzutujNaInt(EndPointID)
+for i in range(len(StartPointID)):
+    x = g.bfs2(StartPointID[i], aa, bb)
+    if len(x)!=1:
+        test=int(x[0][0])
+        for j in range (len(EndPointID)):
+            test2=int(EndPointID[j])
+            naj = g.najkrotsza(x,test,test2)
+            if len(naj)!=2:
+                z.append(naj)
+            print(naj,len(naj))
+
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+for i in z:
+    print(i[0],len(i[0]))
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n\n")
+for i in range (len(z)):
+    z[i][0].reverse()
+kolejnePrzystanki=[]
+for i in range (len(z)):
+    kolejnePrzystanki.append(z[i][0])
+for i in range (len(kolejnePrzystanki)):
+    for j in range (len(kolejnePrzystanki[i])):
+        kolejnePrzystanki[i][j]=PointID_to_StopName(kolejnePrzystanki[i][j])
+for i in kolejnePrzystanki:
+    print(i)
+def wybierzNajkrotszy(przystanki):
+    tmp=przystanki[0]
+    for i in range (len(przystanki)):
+        if len(przystanki[i])<len(tmp):
+            tmp=przystanki[i]
+    return tmp
+
+print("\n\n\n\n Najkrótsza droga między wprowadzonymi przystankami to :")
+x=wybierzNajkrotszy(kolejnePrzystanki)
+print(x)
+# print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+# rzutujNaInt(StartPointID)
+# for i in range(len(StartPointID)):
+#     x = g.bfs2(StartPointID[i], aa, bb)
+#     if len(x)!=1:
+#         z.append(x)
+#     print(x,len(x))
+#
+# print("!!!!!!!!!!!!!!!!!!!!!!!!!\nz:",z)
+#
+# print("!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+# rzutujNaInt(EndPointID)
+# print("EndPointID",EndPointID)
+# for i in range (len(z)):
+#     for j in range (len(EndPointID)):
+#         print("1.",z[i][0][0])
+#         print("2.",EndPointID[j])
+#         naj = g.najkrotsza(z[i], z[i][0][0], EndPointID[j])
+#         print("!",naj)
 
 # print("\n\n\n")
 # g=[]
