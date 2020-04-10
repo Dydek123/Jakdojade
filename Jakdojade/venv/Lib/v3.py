@@ -1,14 +1,10 @@
 import sqlite3
+import copy
 from BFS import *
 
 from collections import defaultdict
 conn = sqlite3.connect("rozklady.sqlite3")
 c = conn.cursor()
-
-
-x=321.123
-format(x, "#8.2f")
-print(x)
 
 ####################################### FUNKCJE ##################################################
 
@@ -71,6 +67,7 @@ def sprawdz_BothVariantID(StartVariantID,EndVariantID):
 
 def zamien_ID_na_nr_linii(id):
     BothVariantLine = []
+    BothVariantID=id[0]
     for i in range (0,len(BothVariantID)):
         id = (BothVariantID[i],)
         trasa = c.execute("SELECT * FROM Variants Where ID=?",id)
@@ -121,20 +118,41 @@ def najblizszy_przystanek(PointID):
                 print("\t", row)
                 g.append([rows[2], row[2]])
     return g
+
+def szukajPolaczen(start,koniec):
+    start=(start,)
+    koniec=(koniec, )
+    startID=(sprawdz_ID(start),)
+    koniecID=(sprawdz_ID(koniec),)
+    StartPointID = sprawdz_PointID(startID)
+    EndPointID = sprawdz_PointID(koniecID)
+    StartVariantID = sprawdz_VariantID(StartPointID)
+    EndVariantID = sprawdz_VariantID(EndPointID)
+    BothVariantID = sprawdz_BothVariantID(StartVariantID, EndVariantID)
+    id = (BothVariantID,)
+    BothVariantLine = zamien_ID_na_nr_linii(id)
+    print("Nazwa wspolnych linii!:", BothVariantLine)
+    return BothVariantLine
+
 ####################################### GLOWNY PROGRAM ############################################
 # Wyszukiwanie ID przystanku poczatkowego
 print("Przystanek poczatkowy")
-start = (input(),)
-# start=("Kawiory", )
+# start = (input(),)
+start=("Biprostal", )
 startID=(sprawdz_ID(start),)
 print("StopID ", start[0], "= ", startID[0])
 
 #Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
-koniec=(input(), )
-# koniec=("Mazowiecka", )
+# koniec=(input(), )
+koniec=("Krowodrza Górka", )
 koniecID=(sprawdz_ID(koniec),)
 print("StopID",koniec[0],"= ",koniecID[0])
+
+#Kara za przesiadkę
+print("\nWybierz kare za przesiadkę")
+# kara=int(input()
+koniec=2
 
 #Możliwe punkty zatrzymania autobusow na przystanku poczatkowym
 print("\n StartPointID:")
@@ -205,8 +223,6 @@ print(przystankiEnd)
 IloscPrzystankow=ile_przystankow(przystankiStart,przystankiEnd)
 print(IloscPrzystankow)
 ####################################### GENERUJ GRAF   ############################################
-
-
 ##############  Przed uruchomieniem okna    ##############
 print("\n\n\n")
 
@@ -256,14 +272,19 @@ for i in range (len(z)):
 kolejnePrzystanki=[]
 for i in range (len(z)):
     kolejnePrzystanki.append(z[i][0])
+trasa=copy.deepcopy(kolejnePrzystanki)
+print("%%%%%%%%%%%%%%%%%%",trasa)
 for i in range (len(kolejnePrzystanki)):
     for j in range (len(kolejnePrzystanki[i])):
         kolejnePrzystanki[i][j]=PointID_to_StopName(kolejnePrzystanki[i][j])
 for i in kolejnePrzystanki:
     print(i)
+
 def wybierzNajkrotszy(przystanki):
     tmp=przystanki[0]
     for i in range (len(przystanki)):
+        q=len(przystanki[i])
+        e=len(tmp)
         if len(przystanki[i])<len(tmp):
             tmp=przystanki[i]
     return tmp
@@ -271,78 +292,44 @@ def wybierzNajkrotszy(przystanki):
 print("\n\n\n\n Najkrótsza droga między wprowadzonymi przystankami to :")
 x=wybierzNajkrotszy(kolejnePrzystanki)
 print(x)
-# print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-# rzutujNaInt(StartPointID)
-# for i in range(len(StartPointID)):
-#     x = g.bfs2(StartPointID[i], aa, bb)
-#     if len(x)!=1:
-#         z.append(x)
-#     print(x,len(x))
-#
-# print("!!!!!!!!!!!!!!!!!!!!!!!!!\nz:",z)
-#
-# print("!!!!!!!!!!!!!!!!!!!!!!!!!\n")
-# rzutujNaInt(EndPointID)
-# print("EndPointID",EndPointID)
-# for i in range (len(z)):
-#     for j in range (len(EndPointID)):
-#         print("1.",z[i][0][0])
-#         print("2.",EndPointID[j])
-#         naj = g.najkrotsza(z[i], z[i][0][0], EndPointID[j])
-#         print("!",naj)
+# x=wybierzNajkrotszy(trasa)
+x = [i for k in x for i in k]
+print("Na pointID",x)
 
-# print("\n\n\n")
-# g=[]
-# n=[]
-# z=[]
-# b=[]
-# PointID=0
-# g.append(najblizszy_przystanek(StartPointID))
-# print("!!!g1",g,"\n")
-# for i in range (1):
-#     for j in range (len(g[i])):
-#         n.append(g[i][j][1])
-#     for k in n:
-#         print("!!!n", n)
-#         PointID=(n.pop(0),)
-#         z.append(najblizszy_przystanek(PointID))
-#         print("z: ",z)
-#     for a in range (len(z[0])):
-#         b.append([z[0][a][0],z[0][a][1]])
-#     print("!!!!!!!!!",b)
-#     g.append(z)
-#     z=[]
-#     # print("g",k,":",g)
-# print("!!!n",n)
-#
-# print("\n\n\n")
-# g=[]
-# n=[]
-# g.append(najblizszy_przystanek(StartPointID))
-# # g.append(najblizszy_przystanek(StartPointID))
-# print("g: ",g)
-# w=0
-# PointID=StartPointID
-# print("EndPointID: ",EndPointID)
-# for j in range (len(g)):        #Ostatecznie While True:
-#     for i in range (len(g[0])):
-#         n.append(g[j][i][1])
-#         for k in range (len(EndPointID)):
-#             if int(EndPointID[k]) == int(g[0][i][1]):
-#                 w=1
-#                 break
-#     if w==1:
-#         break
-#     PointID=n.pop(0)
-#     g.append(najblizszy_przystanek(PointID))
-#
-# print("g2: ",g)
-# # while x not in g[0][j][1]:
-# #     # g.append(najblizszy_przystanek(StartPointID))
-# #     print(j+1)
-# for i in range (len(g[0])):
-#     print(PointID_to_StopName(g[0][i][0]),PointID_to_StopName(g[0][i][1]))
-# print("\n\n\n")
+# linie=[szukajPolaczen(x[i],x[i+1]) for i in range (len(x)-1)]
+# print(linie)
+
+# wybierzlinie=[]
+# for i in range (len(linie)-1):
+#     for j in range (len(linie[i])):
+#         if linie[i][j] in linie[i+1]:
+#             print(linie[i][j])
+#             break
+
+dlugosc=len(x)-1
+wybierzlinie=[]
+pierwsze=szukajPolaczen(x[0],x[1])
+for i in pierwsze:
+    wybierzlinie.append([i])
+for i in range (1,len(x)-1):
+    drugie=szukajPolaczen(x[i],x[i+1])
+    for j in range (len(wybierzlinie)):
+        if wybierzlinie[j][-1] in drugie:
+            wybierzlinie[j].append(wybierzlinie[j][-1])
+        else:
+            for k in range (len(drugie)):
+                tmp=[]
+                tmp=copy.deepcopy(wybierzlinie[j])
+                tmp.append(drugie[k])
+                wybierzlinie.append(tmp)
+#WYPISZ LINIE
+for i in wybierzlinie:
+    if len(i) == dlugosc:
+        print(i)
+
+
+
+#####################   SZUKAJ POłĄCZEń     ###############################
 
 
 
