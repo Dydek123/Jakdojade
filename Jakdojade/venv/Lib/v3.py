@@ -152,7 +152,7 @@ print("StopID",koniec[0],"= ",koniecID[0])
 #Kara za przesiadkę
 print("\nWybierz kare za przesiadkę")
 # kara=int(input()
-koniec=2
+kara=2
 
 #Możliwe punkty zatrzymania autobusow na przystanku poczatkowym
 print("\n StartPointID:")
@@ -323,12 +323,36 @@ for i in range (1,len(x)-1):
                 tmp.append(drugie[k])
                 wybierzlinie.append(tmp)
 #WYPISZ LINIE
-for i in wybierzlinie:
-    if len(i) == dlugosc:
-        print(i)
+gotowe=[]
+for i in range(len(wybierzlinie)):
+    if len(wybierzlinie[i]) == dlugosc:
+        gotowe.append(wybierzlinie[i])
 
+print(gotowe)
+def policz(linie,kara):
+    wynik=[]
+    for i in range (len(linie)):
+        suma=1
+        for j in range (len(linie[i])-1):
+            if linie[i][j] == linie[i][j+1]:
+                suma+=1
+            else:
+                suma=suma+kara+1
+        wynik.append(suma)
+    return wynik
+wynik=policz(gotowe,kara)
 
+for i in range (len(gotowe)):
+    gotowe[i]=set(gotowe[i])
+print(gotowe)
 
+print("\n\n\n\n\n")
+def wypisz(start,koniec,wynik,gotowe,kara):
+    print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=",kara," na trasie", start[0], "-", koniec[0], ":")
+    for i in range (len(wynik)):
+        print("Liniami: ",gotowe[i],wynik[i])
+
+wypisz(start,koniec,wynik,gotowe,kara)
 #####################   SZUKAJ POłĄCZEń     ###############################
 
 
