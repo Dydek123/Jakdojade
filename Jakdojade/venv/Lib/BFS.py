@@ -57,7 +57,7 @@ class Graph:
         while queue:
             for i in range(ile):
                 s = queue.pop(0)
-                print(s, end=" ")
+                # print(s, end=" ")
                 x.append([s, b])
                 for neighbour in self.graph[s]:
                     if neighbour not in visited:
@@ -99,44 +99,7 @@ class Graph:
         droga.reverse()
         return z
 
-g = Graph()
-g.addEdge(84, 90)
-g.addEdge(90, 84)
-g.addEdge(90, 67)
-g.addEdge(90, 3069)
-g.addEdge(3069, 90)
-g.addEdge(67, 90)
-g.addEdge(67, 68)
-g.addEdge(68, 67)
-g.addEdge(68, 71)
-g.addEdge(71, 68)
-g.addEdge(3069, 57)
-g.addEdge(57, 3069)
-g.addEdge(3069, 60)
-g.addEdge(60, 3069)
-g.addEdge(60, 2601)
-g.addEdge(2601, 60)
-g.addEdge(2601, 63)
-g.addEdge(63, 2601)
-g.addEdge(57, 56)
-g.addEdge(56, 57)
-g.addEdge(56, 55)
-g.addEdge(56, 1)
-g.addEdge(1, 56)
-g.addEdge(1, 62)
-g.addEdge(62, 1)
-g.addEdge(62, 63)
-g.addEdge(63, 62)
-g.addEdge(55, 56)
-
-aa = []
-bb = []
-z=[]
-x = g.bfs2(84, aa, bb)
-print("\n",x)
-print(x)
-naj = g.najkrotsza(x, 84, 999)
-print(naj)
-z=naj[0]
-# z.reverse()
-print(z)
+dlugosc=[11.0 ,8.1, 7.2, 6.1, 6.7, 5.5, 5.0, 3.9, 3.1, 2.0, 1.0]
+ile= [3,8,6,11,2,2,10,9,20,10,9]
+for i in range(len(dlugosc)):
+    print("długość ",dlugosc[i],"m sztuk ",ile[i])
