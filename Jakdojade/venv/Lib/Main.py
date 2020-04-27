@@ -6,6 +6,7 @@ from collections import defaultdict
 conn = sqlite3.connect("rozklady.sqlite3")
 c = conn.cursor()
 
+
 ####################################### FUNKCJE ##################################################
 
 #########################   GRAF    #########################
@@ -46,6 +47,7 @@ def SzukajWszystkieDrogi(StartPointID,EndPointID):
     z=[]
     rzutujNaInt(StartPointID)
     rzutujNaInt(EndPointID)
+    x=[]
     for i in range(len(StartPointID)):
         x = g.bfs2(StartPointID[i], aa, bb)
         if len(x)!=1:
@@ -108,8 +110,8 @@ def WprowadzPrzystanek():
 def WybierzKare():
     while(True):
         print("Wybierz kare za przesiadke (0:100)")
-        kara = int(input())
-        if kara>0 and kara<101:
+        kara = float(input())
+        if kara>=0 and kara<101:
             return kara
         print("Niepoprawne dane! Wybierz kare z przedzialu od 0 do 100")
 
@@ -170,7 +172,7 @@ def ktory_przystanek_linii(PointID,BothVariantID):
     for j in range (0,len(BothVariantID)):
         VariantID=BothVariantID[j]
         for i in range (0,len(PointID)):
-            trasa = c.execute("SELECT No FROM Routes WHERE PointID="+PointID[i]+" and VariantID="+VariantID)
+            trasa = c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?",(PointID[i],VariantID))
             for row in trasa:
                 No.append(row[0])
     return No
@@ -193,13 +195,13 @@ def najblizszy_przystanek(PointID):
         x = (i,)
         postoj = c.execute("SELECT VariantID, No, PointID From Routes WHERE PointID=?", x)
         for rows in postoj:
-            # print(rows)
+            print(rows)
             a = str(rows[0])
             d = int(rows[1]) + 1
             b = str(d)
-            y = c.execute("SELECT VariantID, No, PointID From Routes WHERE VariantID=" + a + " and No=" + b)
+            y = c.execute("SELECT VariantID, No, PointID From Routes WHERE VariantID=? and No=?",(a,b))
             for row in y:
-                # print("\t", row)
+                print("\t", row)
                 g.append([rows[2], row[2]])
     return g
 
@@ -273,39 +275,64 @@ def policz(linie,kara):
 
 def wypisz(start,koniec,wynik,gotowe,kara):
     gotoweSet = copy.deepcopy(gotowe)
+    tmp=wynik[0]
+    i=0
     for i in range(len(gotoweSet)):
         gotoweSet[i] = set(gotoweSet[i])
     print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=",kara," na trasie", start[0], "-", koniec[0], ":")
     for i in range (len(wynik)):
-        print("Liniami: ",gotoweSet[i],wynik[i])
-
-def wypiszv2(start,koniec,gotowe,kara,trasa):
-    print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=",kara," na trasie", start[0], "-", koniec[0], ":")
-    for i in range (len(gotowe)):
+        if wynik[i]<=tmp:
+            print("Liniami: ",gotoweSet[i],wynik[i])
+            i+=1
+        else:
+            break
+    return i
+def wypiszv2(start,koniec,gotowe,kara,trasa,ile):
+    # print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=",kara," na trasie", start[0], "-", koniec[0], ":")
+    for i in range (ile):
         pierwszy = start[0]
         print("\nTrasa nr ",i+1)
         print("Linią ",gotowe[i][0]," na trasie",end=": ")
         for j in range (len(gotowe[i])-1):
             if gotowe[i][j]!=gotowe[i][j+1]:
-                print(pierwszy,"-",trasa[j])
+                print(pierwszy,"-",trasa[j+1])
                 print("Linią ",gotowe[i][j+1]," na trasie",end=": ")
-                pierwszy=trasa[j]
+                pierwszy=trasa[j+1]
         else:
             print(pierwszy,"-",koniec[0])
+
+
+######################## WYSZUKAJ TRASY LINII #############################
+def trasaLinii(linia):
+    linia=(linia,)
+    VariantID = []
+    postoj = c.execute("SELECT Id FROM Variants WHERE LineName=?", linia)
+    for row in postoj:
+        VariantID.append(row[0])
+    VariantID = list(set(VariantID))
+    # print(VariantID)
+
+    droga = []
+    for i in range(len(VariantID)):
+        postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?", (VariantID[i],))
+        for row in postoj:
+            droga.append([row[0], row[1]])
+    for i in droga:
+        print(i[0], i[1])
 ####################################### GLOWNY PROGRAM ############################################
 
 # Wyszukiwanie ID przystanku poczatkowego
 
 # start = WprowadzPrzystanek()
 print("Przystanek poczatkowy")
-start=("Biprostal", )
+start=("Narzymskiego", )
 startID=(sprawdz_ID(start),)
 print("StopID ", start[0], "= ", startID[0])
 
 #Wyszukiwanie ID przystanku koncowego
 # koniec = WprowadzPrzystanek()
 print("\nPrzystanek koncowy")
-koniec=("Krowodrza Górka", )
+koniec=("Stary Kleparz", )
 koniecID=(sprawdz_ID(koniec),)
 print("StopID",koniec[0],"= ",koniecID[0])
 
@@ -432,8 +459,8 @@ gotowe=jakieLinieNaTrasie(pierwsze,x,wybierzlinie)
 print(gotowe)
 
 wynik = policz(gotowe, kara)
-wypisz(start,koniec,wynik,gotowe,kara)
-wypiszv2(start,koniec,gotowe,kara,x)
+ile=wypisz(start,koniec,wynik,gotowe,kara)
+wypiszv2(start,koniec,gotowe,kara,x,ile)
 
 #####################   SZUKAJ POłĄCZEń     ###############################
 def szukaj(start,koniec,kara):
@@ -458,10 +485,10 @@ def szukaj(start,koniec,kara):
     zamien_elementy_int_na_str(BothVariantID)
     zamien_elementy_int_na_str(EndPointID)
 
-    #Generuj graf (przed otwarciem okna)
-    g = Graph()
-    GenerujGraf(g)
-
+    # #Generuj graf (przed otwarciem okna)
+    # g = Graph()
+    # GenerujGraf(g)
+    z=[]
     z = SzukajWszystkieDrogi(StartPointID, EndPointID)
     kolejnePrzystanki = wybierzUnikalne(z)
     trasa = copy.deepcopy(kolejnePrzystanki)
@@ -475,13 +502,67 @@ def szukaj(start,koniec,kara):
 
     gotowe = jakieLinieNaTrasie(pierwsze, x, wybierzlinie)
     wynik = policz(gotowe, kara)
-    wypisz(start, koniec, wynik, gotowe, kara)
-    wypiszv2(start, koniec, gotowe, kara, x)
+    ile = wypisz(start, koniec, wynik, gotowe, kara)
+    wypiszv2(start, koniec, gotowe, kara, x, ile)
 
-start=WprowadzPrzystanek()
-koniec=WprowadzPrzystanek()
-kara=WybierzKare()
-szukaj(start,koniec,kara)
+while(True):
+    print("\n1.Wyszukaj droge")
+    print("2.Trasa linii")
+    print("3.Zakończ")
+    wybor = input()
+    if wybor == '2':
+        linia=int(input("Wprowadz linie: "))
+        trasaLinii(linia)
+        continue
+    elif wybor=='1':
+        pass
+    else:
+        break
+    start=WprowadzPrzystanek()
+    koniec=WprowadzPrzystanek()
+    kara=WybierzKare()
+    # szukaj(start,koniec,kara)
+    # szukaj(("Politechnika",),("Miasteczko Studenckie AGH",),3)      #Wkleić kod
+    # szukaj(("Biprostal",),("Krowodrza Górka",),3)
+    startID = (sprawdz_ID(start),)
+    koniecID = (sprawdz_ID(koniec),)
+
+    # Możliwe punkty zatrzymania autobusow na przystanku
+    StartPointID = sprawdz_PointID(startID)
+    EndPointID = sprawdz_PointID(koniecID)
+
+    # Możliwe sposoby przejazdy linii przez dany przystanek
+    StartVariantID = sprawdz_VariantID(StartPointID)
+    EndVariantID = sprawdz_VariantID(EndPointID)
+
+    # Wspolne kombinacje polaczen
+    BothVariantID = sprawdz_BothVariantID(StartVariantID, EndVariantID)
+
+    # #Zamienienie elementow listy z int na str
+    zamien_elementy_int_na_str(StartPointID)
+    zamien_elementy_int_na_str(BothVariantID)
+    zamien_elementy_int_na_str(EndPointID)
+
+    # #Generuj graf (przed otwarciem okna)
+    # g = Graph()
+    # GenerujGraf(g)
+    z = []
+    z = SzukajWszystkieDrogi(StartPointID, EndPointID)
+    kolejnePrzystanki = wybierzUnikalne(z)
+    trasa = copy.deepcopy(kolejnePrzystanki)
+    kolejnePrzystanki = wybierzUnikalneTrasy(kolejnePrzystanki)
+    x = wybierzNajkrotszy(kolejnePrzystanki)
+    x = [i for k in x for i in k]
+
+    dlugosc = len(x) - 1
+    wybierzlinie = []
+    pierwsze = szukajPolaczen(x[0], x[1])
+
+    gotowe = jakieLinieNaTrasie(pierwsze, x, wybierzlinie)
+    wynik = policz(gotowe, kara)
+    ile = wypisz(start, koniec, wynik, gotowe, kara)
+    wypiszv2(start, koniec, gotowe, kara, x, ile)
+
 ####################################################################    WYPISZ ###############################
 # wynik=[[BothVariantLine[i],IloscPrzystankow[i]] for i in range (len(przystankiEnd))]
 #

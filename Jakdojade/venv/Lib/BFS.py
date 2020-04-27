@@ -98,8 +98,3 @@ class Graph:
             z.append(x)
         droga.reverse()
         return z
-
-dlugosc=[11.0 ,8.1, 7.2, 6.1, 6.7, 5.5, 5.0, 3.9, 3.1, 2.0, 1.0]
-ile= [3,8,6,11,2,2,10,9,20,10,9]
-for i in range(len(dlugosc)):
-    print("długość ",dlugosc[i],"m sztuk ",ile[i])

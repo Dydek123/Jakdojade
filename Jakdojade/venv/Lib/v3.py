@@ -86,7 +86,7 @@ def ktory_przystanek_linii(PointID,BothVariantID):
     for j in range (0,len(BothVariantID)):
         VariantID=BothVariantID[j]
         for i in range (0,len(PointID)):
-            trasa = c.execute("SELECT No FROM Routes WHERE PointID="+PointID[i]+" and VariantID="+VariantID)
+            trasa = c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?",(PointID[i],VariantID))
             for row in trasa:
                 No.append(row[0])
     return No
@@ -113,7 +113,7 @@ def najblizszy_przystanek(PointID):
             a = str(rows[0])
             d = int(rows[1]) + 1
             b = str(d)
-            y = c.execute("SELECT VariantID, No, PointID From Routes WHERE VariantID=" + a + " and No=" + b)
+            y = c.execute("SELECT VariantID, No, PointID From Routes WHERE VariantID=? and No=?",(a,b))
             for row in y:
                 print("\t", row)
                 g.append([rows[2], row[2]])
@@ -135,17 +135,36 @@ def szukajPolaczen(start,koniec):
     return BothVariantLine
 
 ####################################### GLOWNY PROGRAM ############################################
+
+########## Wypisz trase linii #############
+linia=(152,)
+def trasaLinii(linia):
+    VariantID=[]
+    postoj = c.execute("SELECT Id FROM Variants WHERE LineName=?", linia)
+    for row in postoj:
+        VariantID.append(row[0])
+    VariantID=list(set(VariantID))
+    # print(VariantID)
+
+    droga=[]
+    for i in range (len(VariantID)):
+        postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?",(VariantID[i],))
+        for row in postoj:
+            droga.append([row[0],row[1]])
+    for i in droga:
+        print(i[0],i[1])
+
 # Wyszukiwanie ID przystanku poczatkowego
 print("Przystanek poczatkowy")
 # start = (input(),)
-start=("Biprostal", )
+start=("Narzymskiego", )
 startID=(sprawdz_ID(start),)
 print("StopID ", start[0], "= ", startID[0])
 
 #Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
 # koniec=(input(), )
-koniec=("Krowodrza Górka", )
+koniec=("Nowy Kleparz", )
 koniecID=(sprawdz_ID(koniec),)
 print("StopID",koniec[0],"= ",koniecID[0])
 
