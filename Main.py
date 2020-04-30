@@ -325,14 +325,14 @@ def trasaLinii(linia):
 
 # start = WprowadzPrzystanek()
 print("Przystanek poczatkowy")
-start=("Narzymskiego", )
+start=("Biprostal", )
 startID=(sprawdz_ID(start),)
 print("StopID ", start[0], "= ", startID[0])
 
 #Wyszukiwanie ID przystanku koncowego
 # koniec = WprowadzPrzystanek()
 print("\nPrzystanek koncowy")
-koniec=("Stary Kleparz", )
+koniec=("Krowodrza Górka", )
 koniecID=(sprawdz_ID(koniec),)
 print("StopID",koniec[0],"= ",koniecID[0])
 

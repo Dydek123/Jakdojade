@@ -157,14 +157,14 @@ def trasaLinii(linia):
 # Wyszukiwanie ID przystanku poczatkowego
 print("Przystanek poczatkowy")
 # start = (input(),)
-start=("Narzymskiego", )
+start=("Miasteczko Studenckie AGH", )
 startID=(sprawdz_ID(start),)
 print("StopID ", start[0], "= ", startID[0])
 
 #Wyszukiwanie ID przystanku koncowego
 print("\nPrzystanek koncowy")
 # koniec=(input(), )
-koniec=("Nowy Kleparz", )
+koniec=("Pilotów", )
 koniecID=(sprawdz_ID(koniec),)
 print("StopID",koniec[0],"= ",koniecID[0])
 
