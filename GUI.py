@@ -59,8 +59,6 @@ class Trasa:
         self.trasa_linii = trasa_linii
 
     def linie(self):
-        wz = 0.12
-        i = 1
         j = 0
         pierwsza = []
         druga = []
@@ -87,8 +85,6 @@ class Trasa:
         napis4 = " "
 
         if self.wybor == 1:
-            z = 0.12
-            z2 = z
             for i in range(len(pierwsza)):
                 if i <= int(len(pierwsza) / 2):
                     napis1 += str(pierwsza[i][0]) + " " + pierwsza[i][1] + "\n"
@@ -101,7 +97,6 @@ class Trasa:
                     napis3 += str(druga[i][0]) + " " + druga[i][1] + "\n"
                 else:
                     napis4 += str(druga[i][0]) + " " + druga[i][1] + "\n"
-                i += 1
 
         # Napisy
         if self.wybor == 1:
@@ -192,93 +187,13 @@ def trasaLinii(linia):
     for row in postoj:
         VariantID.append(row[0])
     VariantID = list(set(VariantID))
-    # print(VariantID)
 
     droga = []
     for i in range(len(VariantID)):
         postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?", (VariantID[i],))
         for row in postoj:
             droga.append([row[0], row[1]])
-    for i in droga:
-        print(i[0], i[1])
     return droga
-
-def wypiszKolejnePrzystanki(wybor):
-    z = 0.12
-    i = 1
-    j = 0
-    pierwsza = []
-    druga = []
-    pierwsza.append([trasa_linii[0][0], trasa_linii[0][1]])
-    for i in range(1, len(trasa_linii)):
-        if j == 0:
-            if trasa_linii[i][0] == 0:
-                j += 1
-                druga.append([trasa_linii[i][0], trasa_linii[i][1]])
-                continue
-            else:
-                pierwsza.append([trasa_linii[i][0], trasa_linii[i][1]])
-        if j == 1:
-            if trasa_linii[i][0] == 0:
-                j += 1
-            else:
-                druga.append([trasa_linii[i][0], trasa_linii[i][1]])
-        i += 1
-    i = 0
-
-    napis1 = " "
-    napis2 = " "
-    napis3 = " "
-    napis4 = " "
-    if wybor == 1:
-        z = 0.12
-        z2 = z
-        for i in range(len(pierwsza)):
-            if i <= int(len(pierwsza) / 2):
-                napis1 += str(pierwsza[i][0]) + " " + pierwsza[i][1] + "\n"
-            else:
-                napis2 += str(pierwsza[i][0]) + " " + pierwsza[i][1] + "\n"
-                z2 += 0.03
-            z += 0.03
-            i += 1
-    if wybor == 2:
-        for i in range(len(druga)):
-            if i <= int(len(druga) / 2):
-                napis3 += str(druga[i][0]) + " " + druga[i][1] + "\n"
-            else:
-                napis4 += str(druga[i][0]) + " " + druga[i][1] + "\n"
-            i += 1
-
-    # Napisy
-    if wybor == 1:
-        global wypisz_trase_napis1
-        wypisz_trase_napis1 = Napis(0.15, 0.1, napis1, 14)
-        wypisz_trase_napis1.pokaz()
-        global wypisz_trase_napis2
-        wypisz_trase_napis2 = Napis(0.55, 0.1, napis2, 14)
-        wypisz_trase_napis2.pokaz()
-    if wybor == 2:
-        global wypisz_trase_napis3
-        wypisz_trase_napis3 = Napis(0.15, 0.1, napis3, 14)
-        wypisz_trase_napis3.pokaz()
-        global wypisz_trase_napis4
-        wypisz_trase_napis4 = Napis(0.55, 0.1, napis4, 14)
-        wypisz_trase_napis4.pokaz()
-
-    if wybor == 1:
-        wybor = 2
-    elif wybor ==2:
-        wybor = 1
-
-
-def SprawdzPrzystanek(nazwa):
-    przystanek = (nazwa.get(),)
-    postoj = c.execute("SELECT Name FROM Stops")
-    for rows in postoj:
-        if przystanek[0] == rows[0]:
-            return przystanek[0]
-    print("Nie ma takiego przystanku, spróbuj ponownie")
-
 
 def pobierz_wartosci_droga():
 
@@ -326,60 +241,6 @@ def pobierz_wartosci_droga():
         trasa = Label(root,text="Trasa " + start + " - " +end + " z karą za przesiadkę równą " + str(kara),bg="#374E53", font=("Times New Roman",16))
         trasa.place(relx=0.25,rely=0.1)
 
-def odpowiednieLinie(wybor):
-    z = 0.12
-    i = 1
-    j = 0
-    pierwsza = []
-    druga = []
-    pierwsza.append([trasa_linii[0][0], trasa_linii[0][1]])
-    for i in range (1,len(trasa_linii)):
-        if j == 0:
-            if trasa_linii[i][0] == 0:
-                j += 1
-                druga.append([trasa_linii[i][0], trasa_linii[i][1]])
-                continue
-            else:
-                pierwsza.append([trasa_linii[i][0], trasa_linii[i][1]])
-        if j == 1:
-            if trasa_linii[i][0] == 0:
-                j += 1
-            else:
-                druga.append([trasa_linii[i][0], trasa_linii[i][1]])
-        i += 1
-    i = 0
-
-    if wybor == 1:
-        z=0.12
-        z2=z
-        for i in range(len(pierwsza)):
-            if i<=int(len(pierwsza)/2):
-                global wypisz_trase_napis1
-                wypisz_trase_napis1 = Napis(0.15, z, str(pierwsza[i][0]) + " " + pierwsza[i][1], 14)
-                wypisz_trase_napis1.pokaz()
-            else:
-                global wypisz_trase_napis2
-                wypisz_trase_napis2 = Napis(0.55, z2, str(pierwsza[i][0]) + " " + pierwsza[i][1], 14)
-                wypisz_trase_napis2.pokaz()
-                z2 +=0.03
-            z += 0.03
-            i += 1
-    if wybor == 2:
-        z = 0.12
-        z2 = z
-        for i in range(len(druga)):
-            if i <= int(len(druga) / 2):
-                global wypisz_trase_napis3
-                wypisz_trase_napis3 = Napis(0.15, z, str(druga[i][0]) + " " + druga[i][1], 14)
-                wypisz_trase_napis3.pokaz()
-            else:
-                global wypisz_trase_napis4
-                wypisz_trase_napis4 = Napis(0.55, z2, str(druga[i][0]) + " " + druga[i][1], 14)
-                wypisz_trase_napis4.pokaz()
-                z2 += 0.03
-            z += 0.03
-            i += 1
-
 def wroc():
     trasa_napis.destroy()
     exit.destroy()
@@ -402,7 +263,6 @@ def odwrocTrase():
         jakaDroga.wybor = 1
         jakaDroga.linie()
         # jakaDroga = Trasa(1,trasaLinii)
-    print(wybor)
 
 def pobierz_wartosci_linia():
     global trasa_linii
@@ -435,16 +295,12 @@ def pobierz_wartosci_linia():
         trasa_button.destroy()
 
         trasa_linii = trasaLinii(droga)
-        print(trasa_linii)
         # Wypisanie wyników
         global trasa_napis
         trasa_napis= Napis(0.43,0.05,"Trasa linii:" + str(droga),16)
         trasa_napis.pokaz()
 
-
-
-    i = 1
-    j = 0
+    j=0
     pierwsza = []
     druga = []
     pierwsza.append([trasa_linii[0][0], trasa_linii[0][1]])
@@ -461,7 +317,6 @@ def pobierz_wartosci_linia():
                 j += 1
             else:
                 druga.append([trasa_linii[i][0], trasa_linii[i][1]])
-        i += 1
     i = 0
 
     global wybor
