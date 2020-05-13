@@ -370,18 +370,24 @@ class Wyszukiwanie():
             wynik.append(suma)
         return wynik
 
+    def wypisz(self):
+        pass
+
+    def szukaj(self):
+        pass
+
 class Bezposrednie(Wyszukiwanie):
     def __init__(self):
         super().__init__()
 
-    def wypiszBezposrednie(self, trasa, ile):
+    def wypisz(self):
         print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=",self.kara," na trasie", self.start[0], "-", self.koniec[0], ":")
-        for i in range(len(ile)):
+        for i in range(len(self.IloscPrzystankow)):
             pierwszy = self.start[0]
             print("\nTrasa nr ", i + 1)
-            print("Linia {0} Ilosc przystankow {1}".format(trasa[i],ile[i]))
+            print("Linia {0} Ilosc przystankow {1}".format(self.BothVariantLine[i],self.IloscPrzystankow[i]))
 
-    def szukajBezposrednie(self):
+    def szukaj(self):
         startID = (self.sprawdz_ID(self.start),)
         koniecID = (self.sprawdz_ID(self.koniec),)
 
@@ -393,7 +399,7 @@ class Bezposrednie(Wyszukiwanie):
         BothVariantID = self.sprawdz_BothVariantID(StartVariantID, EndVariantID)
 
         id = (BothVariantID,)
-        BothVariantLine = self.zamien_ID_na_nr_linii(id)
+        self.BothVariantLine = self.zamien_ID_na_nr_linii(id)
 
         self.zamien_elementy_int_na_str(StartPointID)
         self.zamien_elementy_int_na_str(BothVariantID)
@@ -406,14 +412,16 @@ class Bezposrednie(Wyszukiwanie):
         przystankiStart = przystanki[0]
         przystankiEnd = przystanki[1]
 
-        IloscPrzystankow = self.ile_przystankow(przystankiStart, przystankiEnd)
-        # self.wypiszBezposrednie(BothVariantLine,IloscPrzystankow)
-        return (BothVariantLine,IloscPrzystankow)
+        self.IloscPrzystankow = self.ile_przystankow(przystankiStart, przystankiEnd)
+        # self.wypisz(self.BothVariantLine,self.IloscPrzystankow)
+        return (self.BothVariantLine,self.IloscPrzystankow)
 
 class WszystkieTrasy(Wyszukiwanie):
-    def __init__(self,g):
+    def __init__(self):
         super().__init__()
-        self.g = g
+        g = Graph()
+        graf = GenerujGraf(g)
+        graf.generuj(g)
 
     def szukaj(self):
         # Wyszukiwanie ID przystanku
@@ -436,9 +444,6 @@ class WszystkieTrasy(Wyszukiwanie):
         self.zamien_elementy_int_na_str(BothVariantID)
         self.zamien_elementy_int_na_str(EndPointID)
 
-        # #Generuj graf (przed otwarciem okna)
-        # g = Graph()
-        # GenerujGraf(g)
         z = []
         z = self.SzukajWszystkieDrogi(StartPointID, EndPointID)
         kolejnePrzystanki = self.wybierzUnikalne(z)
@@ -451,24 +456,36 @@ class WszystkieTrasy(Wyszukiwanie):
         wybierzlinie = []
         pierwsze = self.szukajPolaczen(x[0], x[1])
 
-        gotowe = self.jakieLinieNaTrasie(pierwsze, x, wybierzlinie,dlugosc)
-        wynik = self.policz(gotowe, self.kara)
-        ile = self.wypisz(wynik, gotowe)
-        self.wypiszv2(gotowe, x, ile)
+        self.gotowe = self.jakieLinieNaTrasie(pierwsze, x, wybierzlinie,dlugosc)
+        self.wynik = self.policz(self.gotowe, self.kara)
+        # ile = self.wypisz()
+        # self.wypiszv2(gotowe, x, ile)
 
-    def wypisz(self, wynik, gotowe):
-        gotoweSet = copy.deepcopy(gotowe)
-        tmp = wynik[0]
+    def wypisz(self):
+        gotoweSet = copy.deepcopy(self.gotowe)
+        tmp = self.wynik[0]
         i = 0
         for i in range(len(gotoweSet)):
             gotoweSet[i] = set(gotoweSet[i])
         print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=", self.kara, " na trasie", self.start[0], "-", self.koniec[0], ":")
-        for i in range(len(wynik)):
-            if wynik[i] <= tmp:
-                print("Liniami: ", gotoweSet[i], wynik[i])
+        for i in range(len(self.wynik)):
+            if self.wynik[i] <= tmp:
+                # print("Liniami: ", gotoweSet[i], wynik[i])
                 i += 1
             else:
                 break
+        ile = i
+        for i in range(ile):
+            pierwszy = self.start[0]
+            print("\nTrasa nr ", i + 1)
+            print("Linią ", self.gotowe[i][0], " na trasie", end=": ")
+            for j in range(len(self.gotowe[i]) - 1):
+                if self.gotowe[i][j] != self.gotowe[i][j + 1]:
+                    print(pierwszy, "-", trasa[j + 1])
+                    print("Linią ", self.gotowe[i][j + 1], " na trasie", end=": ")
+                    pierwszy = trasa[j + 1]
+            else:
+                print(pierwszy, "-", self.koniec[0])
         return i
 
     def wypiszv2(self, gotowe, trasa, ile):
@@ -485,20 +502,48 @@ class WszystkieTrasy(Wyszukiwanie):
             else:
                 print(pierwszy, "-", self.koniec[0])
 
+class Droga:
+    def __init__(self):
+        pass
+
+    def trasaLinii(self, linia):
+        self.linia = (linia,)
+        VariantID = []
+        postoj = c.execute("SELECT Id FROM Variants WHERE LineName=?", self.linia)
+        for row in postoj:
+            VariantID.append(row[0])
+        VariantID = list(set(VariantID))
+        # print(VariantID)
+
+        self.droga = []
+        for i in range(len(VariantID)):
+            postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?", (VariantID[i],))
+            for row in postoj:
+                self.droga.append([row[0], row[1]])
+        return self.droga
+
+    def wypisz(self):
+        for i in self.droga:
+            print(i[0], i[1])
+
 #Main
 
-# g=Graph()
-# graf = GenerujGraf(g)
-# graf.generuj(g)
-#
-# a = Wyszukiwanie()
-# a.szukajBezposrednie()
+g=Graph()
+graf = GenerujGraf(g)
+graf.generuj(g)
 
-# x = Bezposrednie()
-# print(x.szukajBezposrednie())
+# bezposrednie = Bezposrednie()
+# bezposrednie.szukaj()
+# bezposrednie.wypisz()
 
-# y = WszystkieTrasy(g)
-# y.szukaj()
+# wszystkie = WszystkieTrasy()
+# wszystkie.szukaj()
+# wszystkie.wypisz()
+
+trasa = Droga()
+trasa.trasaLinii(152)
+trasa.wypisz()
+
 # Zamkniecie
-c.close()
-conn.close()
+# c.close()
+# conn.close()
