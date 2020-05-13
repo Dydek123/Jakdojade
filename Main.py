@@ -144,11 +144,11 @@ def sprawdz_VariantID(pointID): #list comprehension !!!
     return variantID
 
 def sprawdz_BothVariantID(StartVariantID,EndVariantID):
-    BothVariantID =[]
-    for i in range(0,len(StartVariantID)):
-        for j in range(0,len(EndVariantID)):
-            if StartVariantID[i]==EndVariantID[j]:
-                BothVariantID.append(StartVariantID[i])
+    BothVariantID =[ StartVariantID[i] for i in range(0,len(StartVariantID))  for j in range(0,len(EndVariantID)) if StartVariantID[i]==EndVariantID[j]]
+    # for i in range(0,len(StartVariantID)):
+    #     for j in range(0,len(EndVariantID)):
+    #         if StartVariantID[i]==EndVariantID[j]:
+    #             BothVariantID.append(StartVariantID[i])
     return  BothVariantID
 
 def zamien_ID_na_nr_linii(id):
