@@ -1,14 +1,11 @@
 """ The module contains the functions needed for proper program operation
-
     Typical usage example:
     bezposrednie = Bezposrednie()
     bezposrednie.szukaj()
     bezposrednie.wypisz()
-
     wszystkie = WszystkieTrasy()
     wszystkie.szukaj()
     wszystkie.wypisz()
-
     trasa = Droga()
     trasa.trasaLinii(152)
     trasa.wypisz()
@@ -178,8 +175,8 @@ class GenerujGraf():
 class Wyszukiwanie():
     """Searches routes between two bus stops."""
     def __init__(self):
-        self.start = self.wprowadz_przystanek()
-        self.koniec = ("Krowodrza Górka",)  # self.wprowadz_przystanek()
+        self.start = ("Biprostal",) #self.wprowadz_przystanek()
+        self.koniec = ("AGH",)  # self.wprowadz_przystanek()
         self.kara = 2  # self.wybierz_kare()
 
     def wszystkie_przystanki(self):
@@ -511,14 +508,13 @@ class WszystkieTrasy(Wyszukiwanie):
         kolejne_przystanki = self.wybierz_unikalne(wszystkie_drogi)
         self.trasa = copy.deepcopy(kolejne_przystanki)
         kolejne_przystanki = self.wybierz_unikalne_trasy(kolejne_przystanki)
-        przystanki = self.wybierz_najkrotszy(kolejne_przystanki)
-        przystanki = [i for k in przystanki for i in k]
-
-        dlugosc = len(przystanki) - 1
+        self.przystanki = self.wybierz_najkrotszy(kolejne_przystanki)
+        self.przystanki = [i for k in self.przystanki for i in k]
+        dlugosc = len(self.przystanki) - 1
         wybierzlinie = []
-        pierwsze = self.szukaj_polaczen(przystanki[0], przystanki[1])
+        pierwsze = self.szukaj_polaczen(self.przystanki[0], self.przystanki[1])
 
-        self.gotowe = self.jakie_linie_na_trasie(pierwsze, przystanki, wybierzlinie, dlugosc)
+        self.gotowe = self.jakie_linie_na_trasie(pierwsze, self.przystanki, wybierzlinie, dlugosc)
         self.wynik = self.policz(self.gotowe, self.kara)
         # ile = self.wypisz()
         # self.wypiszv2(gotowe, x, ile)
@@ -545,9 +541,9 @@ class WszystkieTrasy(Wyszukiwanie):
             print("Linią ", self.gotowe[i][0], " na trasie", end=": ")
             for j in range(len(self.gotowe[i]) - 1):
                 if self.gotowe[i][j] != self.gotowe[i][j + 1]:
-                    print(pierwszy, "-", self.trasa[j + 1])
+                    print(pierwszy, "-", self.przystanki[j + 1])
                     print("Linią ", self.gotowe[i][j + 1], " na trasie", end=": ")
-                    pierwszy = self.trasa[j + 1]
+                    pierwszy = self.przystanki[j + 1]
             else:
                 print(pierwszy, "-", self.koniec[0])
         return i
@@ -603,13 +599,13 @@ graf_polaczen = Graph()
 wygenerowany_graf = GenerujGraf(graf_polaczen)
 wygenerowany_graf.generuj()
 
-bezposrednie = Bezposrednie()
-bezposrednie.szukaj()
-bezposrednie.wypisz()
+# bezposrednie = Bezposrednie()
+# bezposrednie.szukaj()
+# bezposrednie.wypisz()
 
-# wszystkie = WszystkieTrasy()
-# wszystkie.szukaj()
-# wszystkie.wypisz()
+wszystkie = WszystkieTrasy()
+wszystkie.szukaj()
+wszystkie.wypisz()
 
 # spis_przystankow = Droga()
 # spis_przystankow.trasa_linii(152)
