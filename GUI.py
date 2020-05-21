@@ -1,9 +1,13 @@
+""" The module contains the functions needed for creating GUI
+
+    Typical usage example:
+    GUI()
+"""
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
 import copy
-import Szukaj
-from collections import defaultdict
+import szukaj
 
 FILE = "Logo.png"
 BG_COLOR = "#aaaaaa"
@@ -15,88 +19,104 @@ c = conn.cursor()
 
 ####Klasy
 class Logo:
+    """Creates logo on main screen."""
     def __init__(self):
         self.photo = tk.PhotoImage(file=FILE, )
 
     def pokaz(self):
+        """Creates logo."""
         self.logo = tk.Label(root, image=self.photo, bd=0)
         self.logo.place(relx=0, rely=0)
 
     def destroy(self):
+        """Destroys logo"""
         self.logo.destroy()
 
 
 class Napis:
-
-    def __init__(self, x, y, tekst, font_size):
-        self.x = x
-        self.y = y
+    """Creates description for entries"""
+    def __init__(self, pozycja_x, pozycja_y, tekst, font_size):
+        self.pozycja_x = pozycja_x
+        self.pozycja_y = pozycja_y
         self.tekst = tekst
         self.font = font_size
 
     def pokaz(self):
+        """Creates string."""
         self.napis = tk.Label(root, text=self.tekst, bg=BG_COLOR, font=(FONT, self.font))
-        self.napis.place(relx=self.x, rely=self.y)
+        self.napis.place(relx=self.pozycja_x, rely=self.pozycja_y)
 
     def destroy(self):
+        """Destroys string."""
         self.napis.destroy()
 
 
 class Blad(Napis):
-
-    def __init__(self, x, y, tekst, font_size):
-        self.x = x
-        self.y = y
+    """Creates string for errors."""
+    def __init__(self, pozycja_x, pozycja_y, tekst, font_size):
+        self.pozycja_x = pozycja_x
+        self.pozycja_y = pozycja_y
         self.tekst = tekst
         self.font = font_size
 
     def pokaz(self):
+        """Creates label."""
         self.napis = tk.Label(root, text=" ", bg=BG_COLOR, font=(FONT, self.font), foreground='red')
-        self.napis.place(relx=self.x, rely=self.y)
+        self.napis.place(relx=self.pozycja_x, rely=self.pozycja_y)
 
     def config(self):
+        """Change label text."""
         self.napis.config(text=self.tekst)
 
 
-class Pole_do_wpisywania:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+class PoleDoWpisywania:
+    """Creates entry space."""
+    def __init__(self, pozycja_x, pozycja_y):
+        self.pozycja_x = pozycja_x
+        self.pozycja_y = pozycja_y
 
     def pokaz(self):
+        """Creates entry."""
         self.pole = tk.Entry(root)
-        self.pole.place(relwidth=0.4, relheight=0.05, relx=self.x, rely=self.y)
+        self.pole.place(relwidth=0.4, relheight=0.05, relx=self.pozycja_x, rely=self.pozycja_y)
 
     def get(self):
+        """Gets entry value."""
         return self.pole.get()
 
     def destroy(self):
+        """Destroy entry."""
         self.pole.destroy()
 
 
 class Przycisk:
-    def __init__(self, width, height, x, y, tekst, funkcja):
+    """Creates button for given arguments."""
+    def __init__(self, width, height, pozycja_x, pozycja_y, tekst, funkcja):
         self.width = width
         self.height = height
-        self.x = x
-        self.y = y
+        self.pozycja_x = pozycja_x
+        self.pozycja_y = pozycja_y
         self.tekst = tekst
         self.funkcja = funkcja
 
     def pokaz(self):
+        """Creates button."""
         self.przycisk = tk.Button(root, text=self.tekst, command=self.funkcja)
-        self.przycisk.place(relwidth=self.width, relheight=self.height, relx=self.x, rely=self.y)
+        self.przycisk.place(relwidth=self.width, relheight=self.height, relx=self.pozycja_x, rely=self.pozycja_y)
 
     def destroy(self):
+        """Destroy button."""
         self.przycisk.destroy()
 
 
 class Trasa:
+    """Searches for all bus stops for given line."""
     def __init__(self, wybor, trasa_linii):
         self.wybor = wybor
         self.trasa_linii = trasa_linii
 
     def linie(self):
+        """Prints all bus stops for given line."""
         j = 0
         pierwsza = []
         druga = []
@@ -107,8 +127,7 @@ class Trasa:
                     j += 1
                     druga.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
                     continue
-                else:
-                    pierwsza.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
+                pierwsza.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
             if j == 1:
                 if self.trasa_linii[i][0] == 0:
                     j += 1
@@ -164,6 +183,7 @@ class Trasa:
 
 
 class DrogaZPrzystankami:
+    """Searches for shortest routes between two bus stops with total score."""
     def __init__(self, start, koniec, gotowe, kara, trasa, ile, wynik, tmp):
         self.start = start
         self.koniec = koniec
@@ -175,11 +195,12 @@ class DrogaZPrzystankami:
         self.tmp = tmp
 
     def wypisz_napis(self):
+        """Prints routes between two bus stops."""
         koncowy_napis = " "
         for i in range(self.tmp, self.ile):
             pierwszy = self.start[0]
-            z = i + 1
-            tmp = str(z)
+            ktora_trasa = i + 1
+            tmp = str(ktora_trasa)
             koncowy_napis += "\n\nTrasa nr " + tmp + "\t\tWynik: " + str(self.wynik[self.ile - 1])
             koncowy_napis += "\nLinią " + str(self.gotowe[i][0]) + " na trasie: "
             for j in range(len(self.gotowe[i]) - 1):
@@ -192,44 +213,49 @@ class DrogaZPrzystankami:
             else:
                 koncowy_napis = koncowy_napis + str(pierwszy) + "-" + str(self.koniec[0])
 
-        self.x = Napis(0.36, 0.18, koncowy_napis, 12)
-        self.x.pokaz()
+        self.wypisane_trasy = Napis(0.36, 0.18, koncowy_napis, 12)
+        self.wypisane_trasy.pokaz()
 
     def destroy(self):
-        self.x.destroy()
+        """Destroy routes string."""
+        self.wypisane_trasy.destroy()
 
-# self.zmienna = DrogaZPrzystankamiBezposrednia(self.start, self.end, self.gotowe, self.kara, self.x, doIlu, self.wynik, self.tmp)
 class DrogaZPrzystankamiBezposrednia:
-    def __init__(self, start, koniec, kara, BothVariantLine, ile, wynik, tmp):
+    """Searches for direct routes between two bus stops."""
+    def __init__(self, start, koniec, kara, both_variant_line, ile, wynik, tmp):
         self.start = start
         self.koniec = koniec
-        self.BothVariantLine = BothVariantLine
+        self.both_variant_line = both_variant_line
         self.kara = kara
         self.ile = ile
         self.wynik = wynik
         self.tmp = tmp
 
     def wypisz_napis(self):
+        """Prints routes between two bus stops."""
         koncowy_napis = " "
-        for i in range(self.tmp,self.ile):
-            z = i + 1
-            koncowy_napis += "\n\nTrasa nr " + str(z) + "\t\tWynik: " + str(self.wynik[i])
-            koncowy_napis += "\nLinią " + str(self.BothVariantLine[i]) + " na trasie: " + str(self.start[0]) + "-" + str(self.koniec[0]) + "\n"
+        for i in range(self.tmp, self.ile):
+            ktora_trasa = i + 1
+            koncowy_napis += "\n\nTrasa nr " + str(ktora_trasa) + "\t\tWynik: " + str(self.wynik[i])
+            koncowy_napis += "\nLinią " + str(self.both_variant_line[i]) + " na trasie: " + str(
+                self.start[0]) + "-" + str(self.koniec[0]) + "\n"
         if self.ile == 0:
             koncowy_napis += "\n\nBrak bezposrednich polaczen na danej trasie "
-        self.x = Napis(0.36, 0.18, koncowy_napis, 12)
-        self.x.pokaz()
+        self.wypisane_przystanki = Napis(0.36, 0.18, koncowy_napis, 12)
+        self.wypisane_przystanki.pokaz()
 
     def destroy(self):
-        self.x.destroy()
+        """Destroy route string."""
+        self.wypisane_przystanki.destroy()
 
 
-class GUI(Trasa, Szukaj.WszystkieTrasy, Szukaj.Bezposrednie, DrogaZPrzystankami):
+class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami):
+    """Creates GUI"""
     def __init__(self):
         self.logo()
-        self.NapisyWyszukiwanie()
-        self.Pola()
-        self.przyciskiWyszukiwanie()
+        self.napisy_wyszukiwanie()
+        self.pola()
+        self.przyciski_wyszukiwanie()
 
         self.istnieje = 0
         self.tmp = 0
@@ -238,263 +264,259 @@ class GUI(Trasa, Szukaj.WszystkieTrasy, Szukaj.Bezposrednie, DrogaZPrzystankami)
         self.blad = Blad(0.73, 0.79, "Taka linia nie isnieje", 14)
         self.blad.pokaz()
 
-        self.bladStart = Blad(0.73, 0.36, "Taki przystanek nie isnieje", 14)
-        self.bladStart.pokaz()
+        self.blad_start = Blad(0.73, 0.36, "Taki przystanek nie isnieje", 14)
+        self.blad_start.pokaz()
 
-        self.bladKoniec = Blad(0.73, 0.46, "Taka przystanek nie isnieje", 14)
-        self.bladKoniec.pokaz()
+        self.blad_koniec = Blad(0.73, 0.46, "Taka przystanek nie isnieje", 14)
+        self.blad_koniec.pokaz()
 
-        self.bladKara = Blad(0.73, 0.56, "Wprowadzono zle dane", 14)
-        self.bladKara.pokaz()
+        self.blad_kara = Blad(0.73, 0.56, "Wprowadzono zle dane", 14)
+        self.blad_kara.pokaz()
 
     # Opisy
     def logo(self):
+        """Shows logo."""
         self.zdjecie = Logo()
         self.zdjecie.pokaz()
 
-    def NapisyWyszukiwanie(self):
-        self.Przystanek_poczatkowy_tekst = Napis(0.3, 0.32, "Przystanek początkowy:", 12)
-        self.Przystanek_poczatkowy_tekst.pokaz()
+    def napisy_wyszukiwanie(self):
+        """Creates strings."""
+        self.przystanek_poczatkowy_tekst = Napis(0.3, 0.32, "Przystanek początkowy:", 12)
+        self.przystanek_poczatkowy_tekst.pokaz()
 
-        self.Przystanek_koncowy_tekst = Napis(0.3, 0.42, "Przystanek końcowy", 12)
-        self.Przystanek_koncowy_tekst.pokaz()
+        self.przystanek_koncowy_tekst = Napis(0.3, 0.42, "Przystanek końcowy", 12)
+        self.przystanek_koncowy_tekst.pokaz()
 
-        self.Kara_tekst = Napis(0.3, 0.52, "Kara za przesiadkę:", 12)
-        self.Kara_tekst.pokaz()
+        self.kara_tekst = Napis(0.3, 0.52, "Kara za przesiadkę:", 12)
+        self.kara_tekst.pokaz()
 
-        self.Linia_tekst = Napis(0.3, 0.75, "Wybierz linie", 12)
-        self.Linia_tekst.pokaz()
+        self.linia_tekst = Napis(0.3, 0.75, "Wybierz linie", 12)
+        self.linia_tekst.pokaz()
 
     # Pola do wpisywania danych
-    def Pola(self):
-        self.poczatkowy = Pole_do_wpisywania(0.3, 0.35)
+    def pola(self):
+        """Creates entry spaces."""
+        self.poczatkowy = PoleDoWpisywania(0.3, 0.35)
         self.poczatkowy.pokaz()
 
-        self.koncowy = Pole_do_wpisywania(0.3, 0.45)
+        self.koncowy = PoleDoWpisywania(0.3, 0.45)
         self.koncowy.pokaz()
 
-        self.przesiadka = Pole_do_wpisywania(0.3, 0.55)
+        self.przesiadka = PoleDoWpisywania(0.3, 0.55)
         self.przesiadka.pokaz()
 
-        self.linia = Pole_do_wpisywania(0.3, 0.78)
+        self.linia = PoleDoWpisywania(0.3, 0.78)
         self.linia.pokaz()
 
     # Przyciski
-    def przyciskiWyszukiwanie(self):
+    def przyciski_wyszukiwanie(self):
+        """Creates search buttons"""
         self.szukaj_button = Przycisk(0.19, 0.05, 0.3, 0.65, "Szukaj najkrótszych polaczen",
                                       self.pobierz_wartosci_droga)
         self.szukaj_button.pokaz()
 
-        self.szukajBezposrednie_button = Przycisk(0.19, 0.05, 0.51, 0.65, "Szukaj bezpośrednich polaczen",
-                                                  self.bezposrednie_pobierz_wartosci_droga)
-        self.szukajBezposrednie_button.pokaz()
+        self.szukaj_bezposrednie_button = Przycisk(0.19, 0.05, 0.51, 0.65, "Szukaj bezpośrednich polaczen",
+                                                   self.bezposrednie_pobierz_wartosci_droga)
+        self.szukaj_bezposrednie_button.pokaz()
 
         self.trasa_button = Przycisk(0.2, 0.05, 0.4, 0.88, 'Pokaż trasę linii', self.pobierz_wartosci_linia)
         self.trasa_button.pokaz()
 
     # Funkcja zamknij
     def zamknij(self):
+        """Closes the programm."""
         response = messagebox.askokcancel("Potwierdzenie", "Czy na pewno chcesz zamknąć program?")
-        if response == True:
+        if response:
             root.quit()
 
-    def trasaLinii(self, linia):
-        linia = (linia,)
-        VariantID = []
-        postoj = c.execute("SELECT Id FROM Variants WHERE LineName=?", linia)
-        for row in postoj:
-            VariantID.append(row[0])
-        VariantID = list(set(VariantID))
-
-        droga = []
-        for i in range(len(VariantID)):
-            postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?", (VariantID[i],))
-            for row in postoj:
-                droga.append([row[0], row[1]])
-        return droga
-
-    def getValue(self, pole):
+    def get_value(self, pole):
+        """Returns bus names."""
         # Pobranie wartości z pól + kontrola wpisywanych wartości
         start = pole.get()
         postoj = c.execute("SELECT Name FROM Stops")
         for rows in postoj:
             if start == rows[0]:
                 return start
-        else:
-            return 0
+        return 0
 
-    def sprawdzKare(self):
+    def sprawdz_kare(self):
+        """Returns penalty for change line."""
         self.kara = self.przesiadka.get()
         try:
             self.kara = float(self.kara)
-            if (self.kara >= 0 or self.kara <= 100):
+            if self.kara >= 0 or self.kara <= 100:
                 self.kara = float(self.kara)
                 return self.kara
         except:
             return -1
 
-    def zniszczPoczątkowy(self):
+    def zniszcz_początkowy(self):
+        """Destroy all start elements on screen"""
         self.poczatkowy.destroy()
         self.koncowy.destroy()
         self.przesiadka.destroy()
-        self.Przystanek_poczatkowy_tekst.destroy()
-        self.Przystanek_koncowy_tekst.destroy()
-        self.Kara_tekst.destroy()
+        self.przystanek_poczatkowy_tekst.destroy()
+        self.przystanek_koncowy_tekst.destroy()
+        self.kara_tekst.destroy()
         self.szukaj_button.destroy()
-        self.szukajBezposrednie_button.destroy()
-        self.Linia_tekst.destroy()
+        self.szukaj_bezposrednie_button.destroy()
+        self.linia_tekst.destroy()
         self.linia.destroy()
         self.trasa_button.destroy()
         self.zdjecie.destroy()
 
     def pobierz_wartosci_droga(self):
-
+        """Gets bus stops name"""
         # Pobranie wartości + obsługa błędów
-        self.start = self.getValue(self.poczatkowy)
-        self.end = self.getValue(self.koncowy)
-        self.kara = self.sprawdzKare()
+        self.start = self.get_value(self.poczatkowy)
+        self.end = self.get_value(self.koncowy)
+        self.kara = self.sprawdz_kare()
 
         if self.start == 0:
-            self.bladStart.config()
+            self.blad_start.config()
 
         if self.end == 0:
-            self.bladKoniec.config()
+            self.blad_koniec.config()
 
         if self.kara == -1:
-            self.bladKara.config()
+            self.blad_kara.config()
 
         if self.start != 0:
-            self.bladStart.destroy()
-            self.bladStart = Blad(0.73, 0.36, "Taki przystanek nie isnieje", 14)
-            self.bladStart.pokaz()
+            self.blad_start.destroy()
+            self.blad_start = Blad(0.73, 0.36, "Taki przystanek nie isnieje", 14)
+            self.blad_start.pokaz()
 
         if self.end != 0:
-            self.bladKoniec.destroy()
-            self.bladKoniec = Blad(0.73, 0.46, "Taka przystanek nie isnieje", 14)
-            self.bladKoniec.pokaz()
+            self.blad_koniec.destroy()
+            self.blad_koniec = Blad(0.73, 0.46, "Taka przystanek nie isnieje", 14)
+            self.blad_koniec.pokaz()
 
         if self.kara != -1:
-            self.bladKara.destroy()
-            self.bladKara = Blad(0.73, 0.56, "Wprowadzono zle dane", 14)
-            self.bladKara.pokaz()
+            self.blad_kara.destroy()
+            self.blad_kara = Blad(0.73, 0.56, "Wprowadzono zle dane", 14)
+            self.blad_kara.pokaz()
 
         if self.start != 0 and self.end != 0 and self.kara != -1:
             # Zniszczenie pól
-            self.zniszczPoczątkowy()
+            self.zniszcz_początkowy()
             self.dzialanie()
 
     def bezposrednie_pobierz_wartosci_droga(self):
-
+        """Gets bus stops name."""
         # Pobranie wartości + obsługa błędów
-        self.start = self.getValue(self.poczatkowy)
-        self.end = self.getValue(self.koncowy)
-        self.kara = self.sprawdzKare()
+        self.start = self.get_value(self.poczatkowy)
+        self.end = self.get_value(self.koncowy)
+        self.kara = self.sprawdz_kare()
 
         if self.start == 0:
-            self.bladStart.config()
+            self.blad_start.config()
 
         if self.end == 0:
-            self.bladKoniec.config()
+            self.blad_koniec.config()
 
         if self.kara == -1:
-            self.bladKara.config()
+            self.blad_kara.config()
 
         if self.start != 0:
-            self.bladStart.destroy()
-            self.bladStart = Blad(0.73, 0.36, "Taki przystanek nie isnieje", 14)
-            self.bladStart.pokaz()
+            self.blad_start.destroy()
+            self.blad_start = Blad(0.73, 0.36, "Taki przystanek nie isnieje", 14)
+            self.blad_start.pokaz()
 
         if self.end != 0:
-            self.bladKoniec.destroy()
-            self.bladKoniec = Blad(0.73, 0.46, "Taka przystanek nie isnieje", 14)
-            self.bladKoniec.pokaz()
+            self.blad_koniec.destroy()
+            self.blad_koniec = Blad(0.73, 0.46, "Taka przystanek nie isnieje", 14)
+            self.blad_koniec.pokaz()
 
         if self.kara != -1:
-            self.bladKara.destroy()
-            self.bladKara = Blad(0.73, 0.56, "Wprowadzono zle dane", 14)
-            self.bladKara.pokaz()
+            self.blad_kara.destroy()
+            self.blad_kara = Blad(0.73, 0.56, "Wprowadzono zle dane", 14)
+            self.blad_kara.pokaz()
 
         if self.start != 0 and self.end != 0 and self.kara != -1:
             # Zniszczenie pól
-            self.zniszczPoczątkowy()
-            self.dzialanieBezposrednie()
+            self.zniszcz_początkowy()
+            self.dzialanie_bezposrednie()
 
     def wypisz(self):
-        gotoweSet = copy.deepcopy(self.gotowe)
+        """Returns how many results are."""
+        gotowe_set = copy.deepcopy(self.gotowe)
         tmp = self.wynik[0]
         i = 0
-        for i in range(len(gotoweSet)):
-            gotoweSet[i] = set(gotoweSet[i])
+        rozmiar = len(gotowe_set)
+        for i in range(rozmiar):
+            gotowe_set[i] = set(gotowe_set[i])
         for i in range(len(self.wynik)):
             if self.wynik[i] <= tmp:
                 i += 1
             else:
                 break
-        ile = i
-        for i in range(ile):
-            pierwszy = self.start[0]
-            for j in range(len(self.gotowe[i]) - 1):
-                if self.gotowe[i][j] != self.gotowe[i][j + 1]:
-                    pierwszy = self.trasa[j + 1]
+        # ile = i
+        # for i in range(ile):
+        #     pierwszy = self.start[0]
+        #     for j in range(len(self.gotowe[i]) - 1):
+        #         if self.gotowe[i][j] != self.gotowe[i][j + 1]:
+        #             pierwszy = self.trasa[j + 1]
         return i
 
     def dzialanie(self):
+        """Searches for routes with total score."""
         # Wypisanie wyników
-        self.trasaSzukaj = Napis(0.27, 0.1,
-                                 "Trasa " + self.start + " - " + self.end + " z karą za przesiadkę równą " + str(
-                                     self.kara), 16)
-        self.trasaSzukaj.pokaz()
+        self.trasa_szukaj = Napis(0.27, 0.1,
+                                  "Trasa " + self.start + " - " + self.end + " z karą za przesiadkę równą " + str(
+                                      self.kara), 16)
+        self.trasa_szukaj.pokaz()
 
         self.start = (self.start,)
         self.end = (self.end,)
         # Szukanie trasy
-        klasa = Szukaj.WszystkieTrasy()
-        startID = (klasa.sprawdz_ID(self.start),)
-        koniecID = (klasa.sprawdz_ID(self.end),)
+        klasa = szukaj.WszystkieTrasy()
+        start_id = (klasa.sprawdz_id(self.start),)
+        koniec_id = (klasa.sprawdz_id(self.end),)
 
         # Możliwe punkty zatrzymania autobusow na przystanku
-        StartPointID = klasa.sprawdz_PointID(startID)
-        EndPointID = klasa.sprawdz_PointID(koniecID)
+        start_point_id = klasa.sprawdz_point_id(start_id)
+        end_point_id = klasa.sprawdz_point_id(koniec_id)
 
         # Możliwe sposoby przejazdy linii przez dany przystanek
-        StartVariantID = klasa.sprawdz_VariantID(StartPointID)
-        EndVariantID = klasa.sprawdz_VariantID(EndPointID)
+        start_variant_id = klasa.sprawdz_variant_id(start_point_id)
+        end_variant_id = klasa.sprawdz_variant_id(end_point_id)
 
         # Wspolne kombinacje polaczen
-        BothVariantID = klasa.sprawdz_BothVariantID(StartVariantID, EndVariantID)
+        both_variant_id = klasa.sprawdz_both_variant_id(start_variant_id, end_variant_id)
 
         # #Zamienienie elementow listy z int na str
-        klasa.zamien_elementy_int_na_str(StartPointID)
-        klasa.zamien_elementy_int_na_str(BothVariantID)
-        klasa.zamien_elementy_int_na_str(EndPointID)
+        klasa.zamien_elementy_int_na_str(start_point_id)
+        klasa.zamien_elementy_int_na_str(both_variant_id)
+        klasa.zamien_elementy_int_na_str(end_point_id)
 
-        z = []
-        z = klasa.SzukajWszystkieDrogi(StartPointID, EndPointID)
-        kolejnePrzystanki = klasa.wybierzUnikalne(z)
-        self.trasa = copy.deepcopy(kolejnePrzystanki)
-        kolejnePrzystanki = klasa.wybierzUnikalneTrasy(kolejnePrzystanki)
-        self.x = klasa.wybierzNajkrotszy(kolejnePrzystanki)
+        wszystkie_drogi = klasa.szukaj_wszystkie_drogi(start_point_id, end_point_id)
+        kolejne_przystanki = klasa.wybierz_unikalne(wszystkie_drogi)
+        self.trasa = copy.deepcopy(kolejne_przystanki)
+        kolejne_przystanki = klasa.wybierz_unikalne_trasy(kolejne_przystanki)
+        self.x = klasa.wybierz_najkrotszy(kolejne_przystanki)
         self.x = [i for k in self.x for i in k]
 
         self.dlugosc = len(self.x) - 1
         wybierzlinie = []
-        pierwsze = klasa.szukajPolaczen(self.x[0], self.x[1])
+        pierwsze = klasa.szukaj_polaczen(self.x[0], self.x[1])
 
-        self.gotowe = klasa.jakieLinieNaTrasie(pierwsze, self.x, wybierzlinie, self.dlugosc)
+        self.gotowe = klasa.jakie_linie_na_trasie(pierwsze, self.x, wybierzlinie, self.dlugosc)
         self.wynik = klasa.policz(self.gotowe, self.kara)
 
         self.ile = self.wypisz() + 1
 
         if self.ile < 8:
-            self.zmienna = DrogaZPrzystankami(self.start, self.end, self.gotowe, self.kara, self.x, self.ile, self.wynik,self.tmp)
+            self.zmienna = DrogaZPrzystankami(self.start, self.end, self.gotowe, self.kara, self.x, self.ile,
+                                              self.wynik, self.tmp)
             self.zmienna.wypisz_napis()
 
         else:
-            self.zmienna = DrogaZPrzystankami(self.start, self.end, self.gotowe, self.kara, self.x, 7, self.wynik, self.tmp)
+            self.zmienna = DrogaZPrzystankami(self.start, self.end, self.gotowe, self.kara, self.x, 7, self.wynik,
+                                              self.tmp)
             self.zmienna.wypisz_napis()
             self.tmp += 7
 
-            self.wiecej = Przycisk(0.3, 0.05, 0.35, 0.78, "Pokaż więcej", self.pokazWiecej)
+            self.wiecej = Przycisk(0.3, 0.05, 0.35, 0.78, "Pokaż więcej", self.pokaz_wiecej)
             self.wiecej.pokaz()
             self.istnieje = 1
 
@@ -503,117 +525,124 @@ class GUI(Trasa, Szukaj.WszystkieTrasy, Szukaj.Bezposrednie, DrogaZPrzystankami)
         self.wyjscie = Przycisk(0.3, 0.05, 0.15, 0.85, "Zamknij", self.zamknij)
         self.wyjscie.pokaz()
 
-        self.powrot = Przycisk(0.3, 0.05, 0.55, 0.85, "Wróć", self.wrocTrasa)
+        self.powrot = Przycisk(0.3, 0.05, 0.55, 0.85, "Wróć", self.wroc_trasa)
         self.powrot.pokaz()
 
-    def pokazWiecej(self):
+    def pokaz_wiecej(self):
+        """Shows more routes."""
         self.zmienna.destroy()
         if self.tmp > self.ile:
             self.tmp = 0
             self.tymczasowa = 0
         self.tymczasowa += 1
-        doIlu = 7 * self.tymczasowa
-        if doIlu > self.ile:
-            doIlu = self.ile
-        self.zmienna = DrogaZPrzystankami(self.start, self.end, self.gotowe, self.kara, self.x, doIlu, self.wynik, self.tmp)
+        do_ilu = 7 * self.tymczasowa
+        if do_ilu > self.ile:
+            do_ilu = self.ile
+        self.zmienna = DrogaZPrzystankami(self.start, self.end, self.gotowe, self.kara, self.x, do_ilu, self.wynik,
+                                          self.tmp)
         self.zmienna.wypisz_napis()
         self.tmp += 7
 
-
-    def dzialanieBezposrednie(self):
+    def dzialanie_bezposrednie(self):
+        """Searches for direct connection between two bus stops."""
         # Wypisanie wyników
-        self.trasaSzukaj = Napis(0.27, 0.1,
-                                 "Trasa " + self.start + " - " + self.end + " z karą za przesiadkę równą " + str(
-                                     self.kara), 16)
-        self.trasaSzukaj.pokaz()
+        self.trasa_szukaj = Napis(0.27, 0.1,
+                                  "Trasa " + self.start + " - " + self.end + " z karą za przesiadkę równą " + str(
+                                      self.kara), 16)
+        self.trasa_szukaj.pokaz()
 
         self.start = (self.start,)
         self.end = (self.end,)
         # Szukanie trasy
-        klasa = Szukaj.Bezposrednie()
-        startID = (klasa.sprawdz_ID(self.start),)
-        koniecID = (klasa.sprawdz_ID(self.end),)
+        klasa = szukaj.Bezposrednie()
+        start_id = (klasa.sprawdz_id(self.start),)
+        koniec_id = (klasa.sprawdz_id(self.end),)
 
         # Możliwe punkty zatrzymania autobusow na przystanku
-        StartPointID = klasa.sprawdz_PointID(startID)
-        EndPointID = klasa.sprawdz_PointID(koniecID)
+        start_point_id = klasa.sprawdz_point_id(start_id)
+        end_point_id = klasa.sprawdz_point_id(koniec_id)
 
         # Możliwe sposoby przejazdy linii przez dany przystanek
-        StartVariantID = klasa.sprawdz_VariantID(StartPointID)
-        EndVariantID = klasa.sprawdz_VariantID(EndPointID)
+        start_variant_id = klasa.sprawdz_variant_id(start_point_id)
+        end_variant_id = klasa.sprawdz_variant_id(end_point_id)
 
         # Wspolne kombinacje polaczen
-        BothVariantID = klasa.sprawdz_BothVariantID(StartVariantID, EndVariantID)
+        both_variant_id = klasa.sprawdz_both_variant_id(start_variant_id, end_variant_id)
 
-        id = (BothVariantID,)
-        self.BothVariantLine = klasa.zamien_ID_na_nr_linii(id)
+        variant_id = (both_variant_id,)
+        self.BothVariantLine = klasa.zamien_id_na_nr_linii(variant_id)
 
-        klasa.zamien_elementy_int_na_str(StartPointID)
-        klasa.zamien_elementy_int_na_str(BothVariantID)
-        klasa.zamien_elementy_int_na_str(EndPointID)
+        klasa.zamien_elementy_int_na_str(start_point_id)
+        klasa.zamien_elementy_int_na_str(both_variant_id)
+        klasa.zamien_elementy_int_na_str(end_point_id)
 
-        self.No = klasa.ktory_przystanek_linii(StartPointID, BothVariantID)
-        self.No2 = klasa.ktory_przystanek_linii(EndPointID, BothVariantID)
+        self.stop_no = klasa.ktory_przystanek_linii(start_point_id, both_variant_id)
+        self.stop_no2 = klasa.ktory_przystanek_linii(end_point_id, both_variant_id)
 
-        przystanki = klasa.wybierz_odpowiednie_przystanki(self.No, self.No2)
-        przystankiStart = przystanki[0]
-        przystankiEnd = przystanki[1]
+        przystanki = klasa.wybierz_odpowiednie_przystanki(self.stop_no, self.stop_no2)
+        przystanki_start = przystanki[0]
+        przystanki_end = przystanki[1]
 
-        self.IloscPrzystankow = self.ile_przystankow(przystankiStart, przystankiEnd)
-        self.ileTras = len(self.BothVariantLine)
+        self.ilosc_przystankow = self.ile_przystankow(przystanki_start, przystanki_end)
+        self.ile_tras = len(self.BothVariantLine)
 
-        if self.ileTras < 8:
-            self.zmienna = DrogaZPrzystankamiBezposrednia(self.start, self.end, self.kara, self.BothVariantLine, self.ileTras, self.IloscPrzystankow, self.tmp)
+        if self.ile_tras < 8:
+            self.zmienna = DrogaZPrzystankamiBezposrednia(self.start, self.end, self.kara, self.BothVariantLine,
+                                                          self.ile_tras, self.ilosc_przystankow, self.tmp)
             self.zmienna.wypisz_napis()
         else:
-            self.zmienna = DrogaZPrzystankamiBezposrednia(self.start, self.end, self.kara, self.BothVariantLine, 7, self.IloscPrzystankow, self.tmp)
+            self.zmienna = DrogaZPrzystankamiBezposrednia(self.start, self.end, self.kara, self.BothVariantLine, 7,
+                                                          self.ilosc_przystankow, self.tmp)
             self.zmienna.wypisz_napis()
             self.tmp += 7
 
             # Przyciski
-            self.wiecej = Przycisk(0.3, 0.05, 0.35, 0.78, "Pokaż więcej", self.pokazWiecejBezposrednie)
+            self.wiecej = Przycisk(0.3, 0.05, 0.35, 0.78, "Pokaż więcej", self.pokaz_wiecej_bezposrednie)
             self.wiecej.pokaz()
             self.istnieje = 1
 
         self.wyjscie = Przycisk(0.3, 0.05, 0.15, 0.85, "Zamknij", self.zamknij)
         self.wyjscie.pokaz()
 
-        self.powrot = Przycisk(0.3, 0.05, 0.55, 0.85, "Wróć", self.wrocTrasa)
+        self.powrot = Przycisk(0.3, 0.05, 0.55, 0.85, "Wróć", self.wroc_trasa)
         self.powrot.pokaz()
 
-    def pokazWiecejBezposrednie(self):
+    def pokaz_wiecej_bezposrednie(self):
+        """Shows more connections."""
         self.zmienna.destroy()
-        if self.tmp > self.ileTras:
+        if self.tmp > self.ile_tras:
             self.tmp = 0
             self.tymczasowa = 0
         self.tymczasowa += 1
-        doIlu = 7 * self.tymczasowa
-        if doIlu > self.ileTras:
-            doIlu = self.ileTras
-        self.zmienna = DrogaZPrzystankamiBezposrednia(self.start, self.end, self.kara, self.BothVariantLine, doIlu, self.IloscPrzystankow, self.tmp)
+        do_ilu = 7 * self.tymczasowa
+        if do_ilu > self.ile_tras:
+            do_ilu = self.ile_tras
+        self.zmienna = DrogaZPrzystankamiBezposrednia(self.start, self.end, self.kara, self.BothVariantLine, do_ilu,
+                                                      self.ilosc_przystankow, self.tmp)
         self.zmienna.wypisz_napis()
         self.tmp += 7
 
-    def wrocLinie(self):
-        droga = -1
+    def wroc_linie(self):
+        """Backs to previous screen."""
         self.blad = Blad(0.73, 0.79, "Taka linia nie isnieje", 14)
         self.blad.pokaz()
         self.trasa_napis.destroy()
         self.exit.destroy()
         self.again.destroy()
         self.odwroc.destroy()
-        self.jakaDroga.destroy()
+        self.jaka_droga.destroy()
 
         self.logo()
-        self.NapisyWyszukiwanie()
-        self.Pola()
-        self.przyciskiWyszukiwanie()
+        self.napisy_wyszukiwanie()
+        self.pola()
+        self.przyciski_wyszukiwanie()
 
-    def wrocTrasa(self):
+    def wroc_trasa(self):
+        """Backs to previous screen."""
         self.tymczasowa = 1
-        self.tmp =0
+        self.tmp = 0
         self.zmienna.destroy()
-        self.trasaSzukaj.destroy()
+        self.trasa_szukaj.destroy()
         self.wyjscie.destroy()
         self.powrot.destroy()
         if self.istnieje == 1:
@@ -621,23 +650,25 @@ class GUI(Trasa, Szukaj.WszystkieTrasy, Szukaj.Bezposrednie, DrogaZPrzystankami)
             self.istnieje == 0
 
         self.logo()
-        self.NapisyWyszukiwanie()
-        self.Pola()
-        self.przyciskiWyszukiwanie()
+        self.napisy_wyszukiwanie()
+        self.pola()
+        self.przyciski_wyszukiwanie()
 
-    def odwrocTrase(self):
-        self.wybor = self.jakaDroga.wybor
-        self.jakaDroga.destroy()
+    def odwroc_trase(self):
+        """Revesres route."""
+        self.wybor = self.jaka_droga.wybor
+        self.jaka_droga.destroy()
         if self.wybor == 1:
-            self.jakaDroga.wybor = 2
-            self.jakaDroga.linie()
+            self.jaka_droga.wybor = 2
+            self.jaka_droga.linie()
             # jakaDroga = Trasa(2,trasaLinii)
         elif self.wybor == 2:
-            self.jakaDroga.wybor = 1
-            self.jakaDroga.linie()
+            self.jaka_droga.wybor = 1
+            self.jaka_droga.linie()
             # jakaDroga = Trasa(1,trasaLinii)
 
     def pobierz_wartosci_linia(self):
+        """Gets line name."""
         self.droga = self.linia.get()
         try:
             self.trasa = int(self.droga)
@@ -661,17 +692,17 @@ class GUI(Trasa, Szukaj.WszystkieTrasy, Szukaj.Bezposrednie, DrogaZPrzystankami)
             self.poczatkowy.destroy()
             self.koncowy.destroy()
             self.przesiadka.destroy()
-            self.Przystanek_poczatkowy_tekst.destroy()
-            self.Przystanek_koncowy_tekst.destroy()
-            self.Kara_tekst.destroy()
+            self.przystanek_poczatkowy_tekst.destroy()
+            self.przystanek_koncowy_tekst.destroy()
+            self.kara_tekst.destroy()
             self.szukaj_button.destroy()
-            self.szukajBezposrednie_button.destroy()
-            self.Linia_tekst.destroy()
+            self.szukaj_bezposrednie_button.destroy()
+            self.linia_tekst.destroy()
             self.linia.destroy()
             self.trasa_button.destroy()
 
-            self.trasa_linii2 = Szukaj.Droga()
-            self.trasa_linii = self.trasa_linii2.trasaLinii(self.droga)
+            self.trasa_linii2 = szukaj.Droga()
+            self.trasa_linii = self.trasa_linii2.trasa_linii(self.droga)
             # Wypisanie wyników
 
             self.trasa_napis = Napis(0.43, 0.05, "Trasa linii:" + str(self.droga), 16)
@@ -698,15 +729,15 @@ class GUI(Trasa, Szukaj.WszystkieTrasy, Szukaj.Bezposrednie, DrogaZPrzystankami)
 
             self.wybor = 2
 
-            self.jakaDroga = Trasa(self.wybor, self.trasa_linii)
-            self.jakaDroga.linie()
+            self.jaka_droga = Trasa(self.wybor, self.trasa_linii)
+            self.jaka_droga.linie()
 
             # Przyciski
             self.exit = Przycisk(0.2, 0.05, 0.7, 0.85, "Zamknij", self.zamknij)
 
-            self.again = Przycisk(0.2, 0.05, 0.4, 0.85, "Wróć", self.wrocLinie)
+            self.again = Przycisk(0.2, 0.05, 0.4, 0.85, "Wróć", self.wroc_linie)
 
-            self.odwroc = Przycisk(0.2, 0.05, 0.1, 0.85, "Odwróc", self.odwrocTrase)
+            self.odwroc = Przycisk(0.2, 0.05, 0.1, 0.85, "Odwróc", self.odwroc_trase)
 
             self.exit.pokaz()
             self.again.pokaz()
