@@ -38,24 +38,52 @@ class KaraZlyPrzedialException(Exception):
         super().__init__()
         self.kara = kara
 
-def normalize(title):
-    return title.replace('’', "'").lower()
-
-
 class Completer:
-
+    """Helps to complete bus stop name"""
     def __init__(self, titles):
         self.titles = collections.defaultdict(list)
         for title in titles:
-            self.titles[normalize(title)[:2]].append(title)
+            self.titles[title.lower()[:2]].append(title)
+            self.matches = []
 
     def complete(self, text, state):
+        """Helps to complete bus stop name"""
         if state == 0:
-            text = normalize(text)
+            text = text.lower()
             candidates = self.titles.get(text[:2], [])
             self.matches = [
-                c for c in candidates if normalize(c).startswith(text)]
+                char for char in candidates if char.lower().startswith(text)]
         return self.matches[state]
+
+
+def najkrotsza(droga, poczatek, koniec):
+    """Searches the shortest route between two stops"""
+    droga.reverse()
+    # print(droga)
+    start = poczatek
+    end = koniec
+    najkrotsza_droga = []
+    ilosc_drog = 1
+    for j in range(0, ilosc_drog):
+        chwilowa_droga = []
+        poczatek = start
+        koniec = end
+        while True:
+            for i in droga:
+                tmp = i
+                if tmp[0] == koniec:
+                    chwilowa_droga.append(tmp[0])
+                    break
+                if tmp[1] == 0:
+                    return [-1, 0]
+            koniec = tmp[1]
+            if koniec == poczatek:
+                chwilowa_droga.append(koniec)
+                break
+        najkrotsza_droga.append(chwilowa_droga)
+    droga.reverse()
+    return najkrotsza_droga
+
 
 class Graph:
     """Functions in graph."""
@@ -105,73 +133,100 @@ class Graph:
                 break
         return polaczenia
 
-    def najkrotsza(self, droga, poczatek, koniec):
-        """Searches the shortest eoute between two stops"""
-        droga.reverse()
-        # print(droga)
-        start = poczatek
-        end = koniec
-        najkrotsza_droga = []
-        ilosc_drog = 1
-        for j in range(0, ilosc_drog):
-            chwilowa_droga = []
-            poczatek = start
-            koniec = end
-            while True:
-                for i in droga:
-                    tmp = i
-                    if tmp[0] == koniec:
-                        chwilowa_droga.append(tmp[0])
-                        break
-                    if tmp[1] == 0:
-                        return [-1, 0]
-                koniec = tmp[1]
-                if koniec == poczatek:
-                    chwilowa_droga.append(koniec)
-                    break
-            najkrotsza_droga.append(chwilowa_droga)
-        droga.reverse()
-        return najkrotsza_droga
-
-
-class GenerujGraf():
-    """Generates graph."""
-    def __init__(self, graf):
-        self.graf = graf
-
-    def generuj_wierzchołki_grafu(self):
-        """Generates graph vertices."""
-        wierzcholki = set()
-        postoj = c.execute("SELECT Id From Points")
-        for rows in postoj:
-            wierzcholki.add(rows[0])
-        return wierzcholki
-
-    def generuj_krawedzie_grafu(self):
-        """Generates graph edges."""
-        polaczenia = set()
-        tmp = []
-        postoj = c.execute("SELECT VariantId, No, PointId From Routes")
-        for rows in postoj:
-            tmp.append(rows)
-        # print(tmp)
-        for i in range(len(tmp) - 1):
-            if tmp[i][1] < tmp[i + 1][1]:  # and and tmp[i][0]==tmp[i+1][0]
-                polaczenia.add((tmp[i][2], tmp[i + 1][2]))  # zmienic na add
-        return polaczenia
-
     def generuj(self):
         """Adds right edges to graph."""
-        polaczenia = self.generuj_krawedzie_grafu()
+        polaczenia = generuj_krawedzie_grafu()
         # print(polaczenia)
         # print(len(polaczenia))
         polaczenia = list(polaczenia)
 
-        for i in range(len(polaczenia)):
-            self.graf.add_edge(polaczenia[i][0], polaczenia[i][1])
+        for i in polaczenia:
+            self.add_edge(i[0], i[1])
+
+
+def generuj_wierzchołki_grafu():
+    """Generates graph vertices."""
+    wierzcholki = set()
+    postoj = c.execute("SELECT Id From Points")
+    for rows in postoj:
+        wierzcholki.add(rows[0])
+    return wierzcholki
+
+
+def generuj_krawedzie_grafu():
+    """Generates graph edges."""
+    polaczenia = set()
+    tmp = []
+    postoj = c.execute("SELECT VariantId, No, PointId From Routes")
+    for rows in postoj:
+        tmp.append(rows)
+    # print(tmp)
+    for i in range(len(tmp) - 1):
+        if tmp[i][1] < tmp[i + 1][1]:  # and and tmp[i][0]==tmp[i+1][0]
+            polaczenia.add((tmp[i][2], tmp[i + 1][2]))  # zmienic na add
+    return polaczenia
+
+
+# class GenerujGraf():
+#     """Generates graph."""
+#     def __init__(self, graf):
+#         self.graf = graf
+#
+#     def generuj(self):
+#         """Adds right edges to graph."""
+#         polaczenia = generuj_krawedzie_grafu()
+#         # print(polaczenia)
+#         # print(len(polaczenia))
+#         polaczenia = list(polaczenia)
+#
+#         for i in polaczenia:
+#             self.graf.add_edge(i[0], i[1])
 
 
 # Klasa odpowiedzialna za funkcjonalność
+def wszystkie_przystanki():
+    """Returns all bus stops in database."""
+    przystanki = []
+    postoj = c.execute("SELECT Name FROM Stops")
+    for rows in postoj:
+        przystanki.append(rows[0])
+    return przystanki
+
+
+def wprowadz_przystanek():
+    """Provides correct stop input."""
+    lista_przystankow = wszystkie_przystanki()
+    readline.parse_and_bind('tab: complete')
+    readline.set_completer(Completer(lista_przystankow).complete)
+    readline.set_completer_delims('')
+    while True:
+        try:
+            print("Przystanek:", end=" ")
+            przystanek = (input(),)
+            postoj = c.execute("SELECT Name FROM Stops")
+            for rows in postoj:
+                if przystanek[0] == rows[0]:
+                    return przystanek
+            raise BrakPrzystankuException(przystanek)
+        except BrakPrzystankuException:
+            print("Przystanek {} nie istnieje, spróbuj ponownie".format(przystanek[0]))
+
+
+def wybierz_kare():
+    """Provides correct penalty input."""
+    while True:
+        try:
+            print("Wybierz kare za przesiadke (0:100)")
+            kara = float(input())
+            if 0 <= kara < 101:
+                return kara
+            raise KaraZlyPrzedialException(kara)
+        except KaraZlyPrzedialException:
+            print("{} nie należy do danego przedziału ! Wybierz kare od 0 do 100".format(kara))
+        except ValueError:
+            print("To nie jest liczba !")
+
+
 class Wyszukiwanie():
     """Searches routes between two bus stops."""
     def __init__(self):
@@ -179,47 +234,11 @@ class Wyszukiwanie():
         self.koniec = ("AGH",)  # self.wprowadz_przystanek()
         self.kara = 2  # self.wybierz_kare()
 
-    def wszystkie_przystanki(self):
-        """Returns all bus stops in database."""
-        przystanki = []
-        postoj = c.execute("SELECT Name FROM Stops")
-        for rows in postoj:
-            przystanki.append(rows[0])
-        return przystanki
-
-    def wprowadz_przystanek(self):
-        """Provides correct stop input."""
-        lista_przystankow = self.wszystkie_przystanki()
-        readline.parse_and_bind('tab: complete')
-        readline.set_completer(Completer(lista_przystankow).complete)
-        readline.set_completer_delims('')
-        while True:
-            try:
-                print("Przystanek:", end=" ")
-                przystanek = (input(),)
-                postoj = c.execute("SELECT Name FROM Stops")
-                for rows in postoj:
-                    if przystanek[0] == rows[0]:
-                        return przystanek
-                else:
-                    raise BrakPrzystankuException(przystanek)
-            except BrakPrzystankuException:
-                print("Przystanek {} nie istnieje, spróbuj ponownie".format(przystanek[0]))
-
-    def wybierz_kare(self):
-        """Provides correct penalty input."""
-        while True:
-            try:
-                print("Wybierz kare za przesiadke (0:100)")
-                kara = float(input())
-                if 0 <= kara < 101:
-                    return kara
-                else:
-                    raise KaraZlyPrzedialException(kara)
-            except KaraZlyPrzedialException:
-                print("{} nie należy do danego przedziału ! Wybierz kare od 0 do 100".format(kara))
-            except ValueError:
-                print("To nie jest liczba !")
+    def wprowadz_dane(self):
+        """Enters data."""
+        self.start = wprowadz_przystanek()
+        self.koniec = wprowadz_przystanek()
+        self.kara = wybierz_kare()
 
     def sprawdz_id(self, przystanek):
         """Transform stop name to stop ID."""
@@ -245,8 +264,8 @@ class Wyszukiwanie():
     def sprawdz_variant_id(self, point_id):
         """Checks the possible ways for a bus to pass through a given stop."""
         variant_id = []
-        for i in range(0, len(point_id)):
-            postoj = c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=? ORDER BY VariantID", (point_id[i],))
+        for i in point_id:
+            postoj = c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=?", (i,))
             for row in postoj:
                 variant_id.append(row[0])
         variant_id = list(set(variant_id))
@@ -263,8 +282,8 @@ class Wyszukiwanie():
         """Swaps id to line number."""
         both_variant_line = []
         both_variant_id = variant_id[0]
-        for i in range(0, len(both_variant_id)):
-            variant_id = (both_variant_id[i],)
+        for i in both_variant_id:
+            variant_id = (i,)
             trasa = c.execute("SELECT * FROM Variants Where ID=?", variant_id)
             for row in trasa:
                 both_variant_line.append(row[1])
@@ -273,17 +292,18 @@ class Wyszukiwanie():
 
     def zamien_elementy_int_na_str(self, point_id):
         """Converts elements of type int to string."""
-        for i in range(0, len(point_id)):  # Zamienienie elementow listy z int na str
-            point_id[i] = str(point_id[i])
+        for i in point_id:  # Zamienienie elementow listy z int na str
+            i = str(i)
         return point_id
 
     def ktory_przystanek_linii(self, point_id, both_variant_id):
         """Checks which line stop is bus stop."""
         stop_no = []
-        for j in range(0, len(both_variant_id)):
-            variant_id = both_variant_id[j]
-            for i in range(0, len(point_id)):
-                trasa = c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?", (point_id[i], variant_id))
+        for j in both_variant_id:
+            variant_id = j
+            for i in point_id:
+                trasa = c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?",
+                                  (i, variant_id))
                 for row in trasa:
                     stop_no.append(row[0])
         return stop_no
@@ -291,7 +311,8 @@ class Wyszukiwanie():
     @staticmethod
     def ile_przystankow(przystanki_start, przystanki_end):
         """Retrurns number of line stops between two bus stops."""
-        ilosc_przystankow = [przystanki_end[i] - przystanki_start[i] for i in range(len(przystanki_start))]
+        ilosc_przystankow = [przystanki_end[i] - przystanki_start[i]
+                             for i in range(len(przystanki_start))]
         return ilosc_przystankow
 
     @staticmethod
@@ -305,8 +326,9 @@ class Wyszukiwanie():
     @staticmethod
     def rzutuj_na_int(lista):
         """Convert all list elements to int."""
-        for i in range(len(lista)):
-            lista[i] = int(lista[i])
+        for rzutuj in lista:
+            rzutuj = int(rzutuj)
+
 
     def szukaj_wszystkie_drogi(self, start_point_id, end_point_id):
         """Searches whole routes."""
@@ -315,13 +337,13 @@ class Wyszukiwanie():
         self.rzutuj_na_int(start_point_id)
         self.rzutuj_na_int(end_point_id)
 
-        for i in range(len(start_point_id)):
-            krawedz = graf_polaczen.bfs2(start_point_id[i], przystanek_b)
+        for i in start_point_id:
+            krawedz = graf_polaczen.bfs2(i, przystanek_b)
             if len(krawedz) != 1:
                 test = int(krawedz[0][0])
-                for j in range(len(end_point_id)):
-                    test2 = int(end_point_id[j])
-                    naj = graf_polaczen.najkrotsza(krawedz, test, test2)
+                for j in end_point_id:
+                    test2 = int(j)
+                    naj = najkrotsza(krawedz, test, test2)
                     if len(naj) != 2:
                         wszystkie_drogi.append(naj)
                     # print(naj,len(naj))
@@ -330,54 +352,54 @@ class Wyszukiwanie():
     @staticmethod
     def wybierz_unikalne(wszystkie_drogi):
         """Selects unique stops."""
-        for i in range(len(wszystkie_drogi)):
-            wszystkie_drogi[i][0].reverse()
+        for i in wszystkie_drogi:
+            i[0].reverse()
         kolejne_przystanki = []
-        for i in range(len(wszystkie_drogi)):
-            kolejne_przystanki.append(wszystkie_drogi[i][0])
+        for i in wszystkie_drogi:
+            kolejne_przystanki.append(i[0])
         return kolejne_przystanki
 
     def wybierz_unikalne_trasy(self, kolejne_przystanki):
         """Selects unique routes. """
-        for i in range(len(kolejne_przystanki)):
+        rozmiar_kolejne_przystanki = len(kolejne_przystanki)
+        for i in range(rozmiar_kolejne_przystanki):
             for j in range(len(kolejne_przystanki[i])):
                 kolejne_przystanki[i][j] = self.point_id_to_stop_name(kolejne_przystanki[i][j])
 
         unikalna_trasa = []
-        for i in range(len(kolejne_przystanki)):
+        for i in kolejne_przystanki:
             tmp = 0
-            poczatkowy_przystanek = kolejne_przystanki[i][0]
-            przystanek_koncowy = kolejne_przystanki[i][len(kolejne_przystanki[i]) - 1]
-            for j in range(1, len(kolejne_przystanki[i]) - 1):
-                if kolejne_przystanki[i][j] == poczatkowy_przystanek or kolejne_przystanki[i][j] == przystanek_koncowy:
+            poczatek = i[0]
+            ostatni = i[len(i) - 1]
+            for j in range(1, len(i) - 1):
+                if i[j] == poczatek or i[j] == ostatni:
                     tmp = 1
                     break
             if tmp == 1:
                 continue
-            else:
-                unikalna_trasa.append(kolejne_przystanki[i])
+            unikalna_trasa.append(i)
 
         kolejne_przystanki = []
-        for i in range(len(unikalna_trasa)):
+        rozmiar_unikalna_trasa = len(unikalna_trasa)
+        for i in range(rozmiar_unikalna_trasa):
             powtorzony = unikalna_trasa[i]
             tmp = 0
-            for j in range(i + 1, len(unikalna_trasa)):
+            for j in range(i + 1, rozmiar_unikalna_trasa):
                 if unikalna_trasa[j] == powtorzony:
                     tmp = 1
                     break
             if tmp == 1:
                 continue
-            else:
-                kolejne_przystanki.append(unikalna_trasa[i])
+            kolejne_przystanki.append(unikalna_trasa[i])
         return kolejne_przystanki
 
     @staticmethod
     def wybierz_najkrotszy(przystanki):
         """Returns the shortest route."""
         tmp = przystanki[0]
-        for i in range(len(przystanki)):
-            if len(przystanki[i]) < len(tmp):
-                tmp = przystanki[i]
+        for i in przystanki:
+            if len(i) < len(tmp):
+                tmp = i
         return tmp
 
     def szukaj_polaczen(self, start, koniec):
@@ -402,25 +424,26 @@ class Wyszukiwanie():
 
         for i in range(1, len(nazwy_przystankow) - 1):
             drugie_przystanki = self.szukaj_polaczen(nazwy_przystankow[i], nazwy_przystankow[i + 1])
-            for j in range(len(wybierz_linie)):
-                if wybierz_linie[j][-1] in drugie_przystanki:
-                    wybierz_linie[j].append(wybierz_linie[j][-1])
+            for j in wybierz_linie:
+                if j[-1] in drugie_przystanki:
+                    j.append(j[-1])
                 else:
-                    for k in range(len(drugie_przystanki)):
-                        tmp = copy.deepcopy(wybierz_linie[j])
-                        tmp.append(drugie_przystanki[k])
+                    for k in drugie_przystanki:
+                        tmp = copy.deepcopy(j)
+                        tmp.append(k)
                         wybierz_linie.append(tmp)
         gotowe = []
-        for i in range(len(wybierz_linie)):
-            if len(wybierz_linie[i]) == dlugosc:
-                gotowe.append(wybierz_linie[i])
+        for i in wybierz_linie:
+            if len(i) == dlugosc:
+                gotowe.append(i)
         return gotowe
 
     @staticmethod
     def policz(linie, kara):
         """Calculates the total score of the given lines."""
         wynik = []
-        for i in range(len(linie)):
+        rozmiar_linie = len(linie)
+        for i in range(rozmiar_linie):
             suma = 1
             for j in range(len(linie[i]) - 1):
                 if linie[i][j] == linie[i][j + 1]:
@@ -433,16 +456,28 @@ class Wyszukiwanie():
 
 class Bezposrednie(Wyszukiwanie):
     """Searches for direct routes between two bus stop."""
+    def __init__(self):
+        super().__init__()
+        self.ilosc_przystankow = 0
+        self.both_variant_line = "Brak"
+
     def wypisz(self):
         """Prints direct routes."""
-        print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=", self.kara, " na trasie",
-              self.start[0], "-", self.koniec[0], ":")
-        for i in range(len(self.IloscPrzystankow)):
+        my_string = "Trasy bezposrednie na trasie {} - {}:"
+        print(my_string.format(self.start[0], self.koniec[0]))
+        for i in range(len(self.ilosc_przystankow)):
             print("\nTrasa nr ", i + 1)
-            print("Linia {0} Ilosc przystankow {1}".format(self.BothVariantLine[i], self.IloscPrzystankow[i]))
+            my_string = "Linia {0} Ilosc przystankow {1}"
+            print(my_string.format(self.both_variant_line[i], self.ilosc_przystankow[i]))
+
+    def wprowadz_dane(self):
+        """Enters data."""
+        self.start = wprowadz_przystanek()
+        self.koniec = wprowadz_przystanek()
 
     def szukaj(self):
         """Searches for direct routes."""
+        self.wprowadz_dane()
         start_id = (self.sprawdz_id(self.start),)
         koniec_id = (self.sprawdz_id(self.koniec),)
 
@@ -454,7 +489,7 @@ class Bezposrednie(Wyszukiwanie):
         both_variant_id = self.sprawdz_both_variant_id(start_variant_id, end_variant_id)
 
         stop_id = (both_variant_id,)
-        self.BothVariantLine = self.zamien_id_na_nr_linii(stop_id)
+        self.both_variant_line = self.zamien_id_na_nr_linii(stop_id)
 
         self.zamien_elementy_int_na_str(start_point_id)
         self.zamien_elementy_int_na_str(both_variant_id)
@@ -467,9 +502,9 @@ class Bezposrednie(Wyszukiwanie):
         przystanki_start = przystanki[0]
         przystanki_end = przystanki[1]
 
-        self.IloscPrzystankow = self.ile_przystankow(przystanki_start, przystanki_end)
+        self.ilosc_przystankow = self.ile_przystankow(przystanki_start, przystanki_end)
         # self.wypisz(self.BothVariantLine,self.IloscPrzystankow)
-        return self.BothVariantLine, self.IloscPrzystankow
+        return self.both_variant_line, self.ilosc_przystankow
 
 
 class WszystkieTrasy(Wyszukiwanie):
@@ -477,13 +512,16 @@ class WszystkieTrasy(Wyszukiwanie):
     def __init__(self):
         super().__init__()
         graf = Graph()
-        generowany_graf = GenerujGraf(graf)
-        generowany_graf.generuj()
+        graf.generuj()
         self.wynik = 0
         self.gotowe = 0
 
+        self.trasa = 0
+        self.przystanki = 0
+
     def szukaj(self):
         """Searches for shortest routes with total score."""
+        self.wprowadz_dane()
         # Wyszukiwanie ID przystanku
         start_id = (self.sprawdz_id(self.start),)
         koniec_id = (self.sprawdz_id(self.koniec),)
@@ -524,10 +562,11 @@ class WszystkieTrasy(Wyszukiwanie):
         gotowe_set = copy.deepcopy(self.gotowe)
         tmp = self.wynik[0]
         i = 0
-        for i in range(len(gotowe_set)):
+        rozmiar_gotowe = len(gotowe_set)
+        for i in range(rozmiar_gotowe):
             gotowe_set[i] = set(gotowe_set[i])
-        print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=", self.kara, " na trasie",
-              self.start[0], "-", self.koniec[0], ":")
+        my_string = "Łączne wyniki z karą za przesiadkę= {} na trasie {} - {}:"
+        print(my_string.format(self.kara, self.start[0], self.koniec[0]))
         for i in range(len(self.wynik)):
             if self.wynik[i] <= tmp:
                 # print("Liniami: ", gotoweSet[i], wynik[i])
@@ -550,7 +589,6 @@ class WszystkieTrasy(Wyszukiwanie):
 
     def wypiszv2(self, gotowe, trasa, ile):
         """Prints final results."""
-        # print("Łączne wyniki z uwzględnieniem przesiadek oraz karą za przesiadkę=",kara," na trasie", start[0], "-", koniec[0], ":")
         for i in range(ile):
             pierwszy = self.start[0]
             print("\nTrasa nr ", i + 1)
@@ -582,7 +620,8 @@ class Droga:
         # print(VariantID)
 
         for i in enumerate(variant_id):
-            postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?", (variant_id[i[0]],))
+            postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?",
+                               (variant_id[i[0]],))
             for row in postoj:
                 self.droga.append([row[0], row[1]])
         return self.droga
@@ -596,17 +635,18 @@ class Droga:
 # Main
 
 graf_polaczen = Graph()
-wygenerowany_graf = GenerujGraf(graf_polaczen)
-wygenerowany_graf.generuj()
+graf_polaczen.generuj()
+# wygenerowany_graf = GenerujGraf(graf_polaczen)
+# wygenerowany_graf.generuj()
 
 # bezposrednie = Bezposrednie()
 # bezposrednie.szukaj()
 # bezposrednie.wypisz()
 
-wszystkie = WszystkieTrasy()
-wszystkie.szukaj()
-wszystkie.wypisz()
-
+# wszystkie = WszystkieTrasy()
+# wszystkie.szukaj()
+# wszystkie.wypisz()
+#
 # spis_przystankow = Droga()
 # spis_przystankow.trasa_linii(152)
 # spis_przystankow.wypisz()
