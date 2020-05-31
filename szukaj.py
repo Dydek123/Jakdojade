@@ -242,78 +242,111 @@ class Wyszukiwanie():
 
     def sprawdz_id(self, przystanek):
         """Transform stop name to stop ID."""
-        postoj = c.execute("SELECT StopID FROM Points WHERE StopName=? order by StopID", przystanek)
-        for rows in postoj:
-            cos = rows[0]
-        przystanek = (cos,)
-        return przystanek[0]
+        try:
+            postoj = c.execute("SELECT StopID FROM Points"
+                               " WHERE StopName=? "
+                               "order by StopID", przystanek)
+            for rows in postoj:
+                cos = rows[0]
+            przystanek = (cos,)
+            return przystanek[0]
+        except (UnboundLocalError, ValueError, sqlite3.ProgrammingError):
+            raise Exception("Not a valid bus stop name")
 
     def sprawdz_point_id(self, przystanek_id):
         """Checks available points to stop."""
-        postoj = c.execute("SELECT ID From Points WHERE StopId=?", przystanek_id)
-        point_id = [rows[0] for rows in postoj]
-        return point_id
+        try:
+            postoj = c.execute("SELECT ID From Points WHERE StopId=?", przystanek_id)
+            point_id = [rows[0] for rows in postoj]
+            if not point_id:
+                raise Exception("Bus stop does not exists.")
+            return point_id
+        except (UnboundLocalError, ValueError, sqlite3.ProgrammingError):
+            raise Exception("Not a valid bus stop id")
 
     def point_id_to_stop_name(self, przystanek_id):
         """Swaps point id to stop name"""
-        point_id = (przystanek_id,)
-        postoj = c.execute("SELECT StopName From Points WHERE Id=?", point_id)
-        stop_name = [rows[0] for rows in postoj]
-        return stop_name
+        try:
+            point_id = (przystanek_id,)
+            postoj = c.execute("SELECT StopName From Points WHERE Id=?", point_id)
+            stop_name = [rows[0] for rows in postoj]
+            if not stop_name:
+                raise Exception("Not a valid bus stop id")
+            return stop_name
+        except (UnboundLocalError, ValueError, sqlite3.ProgrammingError, sqlite3.InterfaceError):
+            raise Exception("Not a valid bus stop id")
 
     def sprawdz_variant_id(self, point_id):
         """Checks the possible ways for a bus to pass through a given stop."""
-        variant_id = []
-        for i in point_id:
-            postoj = c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=?", (i,))
-            for row in postoj:
-                variant_id.append(row[0])
-        variant_id = list(set(variant_id))
-        return variant_id
+        try:
+            variant_id = []
+            for i in point_id:
+                postoj = c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=?", (i,))
+                for row in postoj:
+                    variant_id.append(row[0])
+            variant_id = list(set(variant_id))
+            if not variant_id:
+                raise Exception("Not a valid bus stop point id - empty list")
+            return variant_id
+        except (UnboundLocalError, ValueError, sqlite3.ProgrammingError, sqlite3.InterfaceError):
+            raise Exception("Not a valid bus stop point id")
 
     def sprawdz_both_variant_id(self, start_variant_id, end_variant_id):
         """Returns connection combinations."""
-        both_variant_id = [start_variant_id[i] for i in range(0, len(start_variant_id))
-                           for j in range(0, len(end_variant_id))
-                           if start_variant_id[i] == end_variant_id[j]]
-        return both_variant_id
+        try:
+            both_variant_id = [start_variant_id[i] for i in range(0, len(start_variant_id))
+                               for j in range(0, len(end_variant_id))
+                               if start_variant_id[i] == end_variant_id[j]]
+            return both_variant_id
+        except (UnboundLocalError, ValueError, sqlite3.ProgrammingError, sqlite3.InterfaceError):
+            raise Exception("Not a valid start or end variant id")
 
     def zamien_id_na_nr_linii(self, variant_id):
         """Swaps id to line number."""
-        both_variant_line = []
-        both_variant_id = variant_id[0]
-        for i in both_variant_id:
-            variant_id = (i,)
-            trasa = c.execute("SELECT * FROM Variants Where ID=?", variant_id)
-            for row in trasa:
-                both_variant_line.append(row[1])
-        both_variant_line = list(set(both_variant_line))
-        return both_variant_line
+        try:
+            both_variant_line = []
+            both_variant_id = variant_id[0]
+            for i in both_variant_id:
+                variant_id = (i,)
+                trasa = c.execute("SELECT * FROM Variants Where ID=?", variant_id)
+                for row in trasa:
+                    both_variant_line.append(row[1])
+            both_variant_line = list(set(both_variant_line))
+            return both_variant_line
+        except TypeError:
+            raise Exception("Not a valid variant id")
 
-    def zamien_elementy_int_na_str(self, point_id):
+    def zamien_elementy_int_na_str(self, int_list):
         """Converts elements of type int to string."""
-        for i in point_id:  # Zamienienie elementow listy z int na str
-            i = str(i)
-        return point_id
+        str_list = [str(i) for i in int_list]
+        return str_list
 
     def ktory_przystanek_linii(self, point_id, both_variant_id):
         """Checks which line stop is bus stop."""
-        stop_no = []
-        for j in both_variant_id:
-            variant_id = j
-            for i in point_id:
-                trasa = c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?",
-                                  (i, variant_id))
-                for row in trasa:
-                    stop_no.append(row[0])
-        return stop_no
+        try:
+            stop_no = []
+            for j in both_variant_id:
+                variant_id = j
+                for i in point_id:
+                    trasa = c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?",
+                                      (i, variant_id))
+                    for row in trasa:
+                        stop_no.append(row[0])
+            if not stop_no:
+                raise Exception("Returns empty list")
+            return stop_no
+        except (UnboundLocalError, ValueError, sqlite3.ProgrammingError, sqlite3.InterfaceError):
+            raise Exception("Not a valid start or end variant id")
 
     @staticmethod
     def ile_przystankow(przystanki_start, przystanki_end):
         """Retrurns number of line stops between two bus stops."""
-        ilosc_przystankow = [przystanki_end[i] - przystanki_start[i]
-                             for i in range(len(przystanki_start))]
-        return ilosc_przystankow
+        try:
+            ilosc_przystankow = [przystanki_end[i] - przystanki_start[i]
+                                 for i in range(len(przystanki_start))]
+            return ilosc_przystankow
+        except TypeError:
+            raise Exception("Not a valid bus stop number")
 
     @staticmethod
     def wybierz_odpowiednie_przystanki(stop_no, stop_no2):
@@ -326,9 +359,13 @@ class Wyszukiwanie():
     @staticmethod
     def rzutuj_na_int(lista):
         """Convert all list elements to int."""
-        for rzutuj in lista:
-            rzutuj = int(rzutuj)
-
+        try:
+            rzutuj = [int(i) for i in lista]
+            return rzutuj
+        except ValueError:
+            raise Exception("One of element can not be convert to int")
+        except TypeError:
+            raise Exception("Not valid argument")
 
     def szukaj_wszystkie_drogi(self, start_point_id, end_point_id):
         """Searches whole routes."""
@@ -639,17 +676,21 @@ graf_polaczen.generuj()
 # wygenerowany_graf = GenerujGraf(graf_polaczen)
 # wygenerowany_graf.generuj()
 
-# bezposrednie = Bezposrednie()
-# bezposrednie.szukaj()
-# bezposrednie.wypisz()
+if __name__ == '__main__':
 
-# wszystkie = WszystkieTrasy()
-# wszystkie.szukaj()
-# wszystkie.wypisz()
-#
-# spis_przystankow = Droga()
-# spis_przystankow.trasa_linii(152)
-# spis_przystankow.wypisz()
+    wyszukiwarka = Wyszukiwanie()
+    print(wyszukiwarka.rzutuj_na_int( ['5.5'] ) )
+    # bezposrednie = Bezposrednie()
+    # bezposrednie.szukaj()
+    # bezposrednie.wypisz()
+
+    # wszystkie = WszystkieTrasy()
+    # wszystkie.szukaj()
+    # wszystkie.wypisz()
+
+    # spis_przystankow = Droga()
+    # spis_przystankow.trasa_linii(152)
+    # spis_przystankow.wypisz()
 
 # Zamkniecie
 # c.close()
