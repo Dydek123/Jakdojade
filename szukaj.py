@@ -371,30 +371,36 @@ class Wyszukiwanie():
         """Searches whole routes."""
         przystanek_b = []
         wszystkie_drogi = []
-        self.rzutuj_na_int(start_point_id)
-        self.rzutuj_na_int(end_point_id)
+        try:
+            self.rzutuj_na_int(start_point_id)
+            self.rzutuj_na_int(end_point_id)
 
-        for i in start_point_id:
-            krawedz = graf_polaczen.bfs2(i, przystanek_b)
-            if len(krawedz) != 1:
-                test = int(krawedz[0][0])
-                for j in end_point_id:
-                    test2 = int(j)
-                    naj = najkrotsza(krawedz, test, test2)
-                    if len(naj) != 2:
-                        wszystkie_drogi.append(naj)
-                    # print(naj,len(naj))
-        return wszystkie_drogi
+            for i in start_point_id:
+                krawedz = graf_polaczen.bfs2(i, przystanek_b)
+                if len(krawedz) != 1:
+                    test = int(krawedz[0][0])
+                    for j in end_point_id:
+                        test2 = int(j)
+                        naj = najkrotsza(krawedz, test, test2)
+                        if len(naj) != 2:
+                            wszystkie_drogi.append(naj)
+                        # print(naj,len(naj))
+            return wszystkie_drogi
+        except (TypeError, ValueError):
+            raise Exception("Not a valid arguments")
 
     @staticmethod
     def wybierz_unikalne(wszystkie_drogi):
         """Selects unique stops."""
-        for i in wszystkie_drogi:
-            i[0].reverse()
-        kolejne_przystanki = []
-        for i in wszystkie_drogi:
-            kolejne_przystanki.append(i[0])
-        return kolejne_przystanki
+        try:
+            for i in wszystkie_drogi:
+                i[0].reverse()
+            kolejne_przystanki = []
+            for i in wszystkie_drogi:
+                kolejne_przystanki.append(i[0])
+            return kolejne_przystanki
+        except (TypeError, ValueError, AttributeError):
+            raise Exception("Not a valid arguments")
 
     def wybierz_unikalne_trasy(self, kolejne_przystanki):
         """Selects unique routes. """
@@ -433,11 +439,14 @@ class Wyszukiwanie():
     @staticmethod
     def wybierz_najkrotszy(przystanki):
         """Returns the shortest route."""
-        tmp = przystanki[0]
-        for i in przystanki:
-            if len(i) < len(tmp):
-                tmp = i
-        return tmp
+        try:
+            tmp = przystanki[0]
+            for i in przystanki:
+                if len(i) < len(tmp):
+                    tmp = i
+            return tmp
+        except TypeError:
+            Exception("Not a valid arguments")
 
     def szukaj_polaczen(self, start, koniec):
         """Returns list of lines number available between start and end stops."""
@@ -679,7 +688,7 @@ graf_polaczen.generuj()
 if __name__ == '__main__':
 
     wyszukiwarka = Wyszukiwanie()
-    print(wyszukiwarka.rzutuj_na_int( ['5.5'] ) )
+    print(wyszukiwarka.szukaj_polaczen( 'Plac Inwalidów', 'AGHH') )
     # bezposrednie = Bezposrednie()
     # bezposrednie.szukaj()
     # bezposrednie.wypisz()
