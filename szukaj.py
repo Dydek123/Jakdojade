@@ -363,8 +363,6 @@ class Wyszukiwanie():
                                       (i, variant_id))
                     for row in trasa:
                         stop_no.append(row[0])
-            if not stop_no:
-                raise BrakPrzystankuException("Returns empty list")
             return stop_no
         except (TypeError, ValueError, sqlite3.ProgrammingError, sqlite3.InterfaceError):
             raise ZlaFormaArgumentow("Not a valid start or end variant id")
@@ -541,12 +539,15 @@ class Bezposrednie(Wyszukiwanie):
 
     def wypisz(self):
         """Prints direct routes."""
-        my_string = "Trasy bezposrednie na trasie {} - {}:"
-        print(my_string.format(self.start[0], self.koniec[0]))
-        for i in range(len(self.ilosc_przystankow)):
-            print("\nTrasa nr ", i + 1)
-            my_string = "Linia {0}"
-            print(my_string.format(self.both_variant_line[i]))
+        if self.both_variant_line == [] or self.ilosc_przystankow == []:
+            print("Brak połączeń bezpośrednich")
+        else:
+            my_string = "Trasy bezposrednie na trasie {} - {}:"
+            print(my_string.format(self.start[0], self.koniec[0]))
+            for i in range(len(self.ilosc_przystankow)):
+                print("\nTrasa nr ", i + 1)
+                my_string = "Linia {0}"
+                print(my_string.format(self.both_variant_line[i]))
 
     def wprowadz_dane(self):
         """Enters data."""

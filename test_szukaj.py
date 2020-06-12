@@ -71,9 +71,6 @@ class WyszukiwainieTest(unittest.TestCase):
         self.assertRaises(szukaj.ZlaFormaArgumentow,
                           self.wyszukiwarka.ktory_przystanek_linii,
                           113, 1085738)
-        self.assertRaises(szukaj.BrakPrzystankuException,
-                          self.wyszukiwarka.ktory_przystanek_linii,
-                          [113], [1085738])
 
     def test_ile_przystankow(self):
         self.assertEqual(self.wyszukiwarka.ile_przystankow([2, 5], [3, 8]), [1, 3])

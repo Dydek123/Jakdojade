@@ -154,16 +154,16 @@ class Trasa:
         if self.wybor == 1:
             for i in range(rozmiar1):
                 if i <= int(rozmiar1 / 2):
-                    napis1 += str(pierwsza[i][0]) + " " + pierwsza[i][1] + "\n"
+                    napis1 += "{} {} \n".format(str(pierwsza[i][0]), pierwsza[i][1])
                 else:
-                    napis2 += str(pierwsza[i][0]) + " " + pierwsza[i][1] + "\n"
+                    napis2 += "{} {} \n".format(str(pierwsza[i][0]), pierwsza[i][1])
                 i += 1
         if self.wybor == 2:
             for i in range(rozmiar2):
                 if i <= int(rozmiar2 / 2):
-                    napis3 += str(druga[i][0]) + " " + druga[i][1] + "\n"
+                    napis3 += "{} {} \n".format(str(druga[i][0]), druga[i][1])
                 else:
-                    napis4 += str(druga[i][0]) + " " + druga[i][1] + "\n"
+                    napis4 += "{} {} \n".format(str(druga[i][0]), druga[i][1])
 
         # Napisy
         if self.wybor == 1:
@@ -213,18 +213,17 @@ class DrogaZPrzystankami:
             pierwszy = self.start[0]
             ktora_trasa = i + 1
             tmp = str(ktora_trasa)
-            koncowy_napis += "\n\nTrasa nr " + tmp + "\t\tWynik: " + str(self.wynik[ktora_trasa - 1])
-            koncowy_napis += "\nLinią " + str(self.gotowe[i][0]) + " na trasie: "
+            koncowy_napis += "\nTrasa nr {} \t\tWynik: {}".format(tmp,
+                                                                  str(self.wynik[ktora_trasa - 1]))
+            koncowy_napis += "\nLinią {} na trasie: ".format(str(self.gotowe[i][0]))
             for j in range(len(self.gotowe[i]) - 1):
                 if self.gotowe[i][j] != self.gotowe[i][j + 1]:
-                    koncowy_napis = koncowy_napis + str(pierwszy) + "-" + self.trasa[j + 1]
-                    koncowy_napis = koncowy_napis + "\n"
-                    koncowy_napis = koncowy_napis + "Linią " + str(self.gotowe[i][j + 1])
-                    koncowy_napis = koncowy_napis + " na trasie"
+                    koncowy_napis += "{}-{}\n".format(str(pierwszy), self.trasa[j + 1])
+                    koncowy_napis += "Linią {} na trasie".format(str(self.gotowe[i][j + 1]))
                     pierwszy = self.trasa[j + 1]
                     # print(koncowy_napis)
             else:
-                koncowy_napis = koncowy_napis + str(pierwszy) + "-" + str(self.koniec[0])
+                koncowy_napis += "{}-{}\n".format(str(pierwszy), str(self.koniec[0]))
                 # print(koncowy_napis)
 
         self.wypisane_trasy = Napis(0.36, 0.18, koncowy_napis, 12)
@@ -252,9 +251,11 @@ class DrogaZPrzystankamiBezposrednia:
         koncowy_napis = " "
         for i in range(self.tmp, self.ile):
             ktora_trasa = i + 1
-            koncowy_napis += "\n\nTrasa nr " + str(ktora_trasa) + "\t\tWynik: " + str(self.wynik[i])
-            koncowy_napis += "\nLinią " + str(self.both_variant_line[i]) + " na trasie: " + str(
-                self.start[0]) + "-" + str(self.koniec[0]) + "\n"
+            koncowy_napis += "\n\nTrasa nr {} \t\tWynik: {}".format(str(ktora_trasa),
+                                                                    str(self.wynik[i]))
+            koncowy_napis += "\nLinią {} na trasie: {}-{} \n".format(str(self.both_variant_line[i]),
+                                                                     str(self.start[0]),
+                                                                     str(self.koniec[0]))
         if self.ile == 0:
             koncowy_napis += "\n\nBrak bezposrednich polaczen na danej trasie "
         self.wypisane_przystanki = Napis(0.36, 0.18, koncowy_napis, 12)
@@ -653,14 +654,14 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
         self.zmienna.wypisz_napis()
         self.tmp += 7
 
-    def wroc_linie(self, exit, again, odwroc):
+    def wroc_linie(self):
         """Backs to previous screen."""
         self.blad = Blad(0.73, 0.79, "Taka linia nie isnieje", 14)
         self.blad.pokaz()
         self.trasa_napis.destroy()
-        exit.destroy()
-        again.destroy()
-        odwroc.destroy()
+        self.exit.destroy()
+        self.again.destroy()
+        self.odwroc.destroy()
         self.jaka_droga.destroy()
 
         self.logo()
@@ -692,13 +693,16 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
         if self.wybor == 1:
             self.jaka_droga.wybor = 2
             self.jaka_droga.linie()
-            # jakaDroga = Trasa(2,trasaLinii)
+            # print(self.trasa_linii)
+            # self.jakaDroga = Trasa(2,self.trasa_linii)
         elif self.wybor == 2:
             self.jaka_droga.wybor = 1
             self.jaka_droga.linie()
-            # jakaDroga = Trasa(1,trasaLinii)
+            # print(self.trasa_linii)
+            # self.jakaDroga = Trasa(1,self.trasa_linii)
 
     def zniszcz_ekran_startowy(self):
+        """Destroys all elements on start menu."""
         self.blad.destroy()
         self.zdjecie.destroy()
         self.poczatkowy.destroy()
@@ -762,7 +766,7 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
             self.jaka_droga.linie()
 
             # Przyciski
-            self.exit = Przycisk(0.2, 0.05, 0.7, 0.85, "Zamknij", self.zamknij)
+            self.exit = Przycisk(0.2, 0.05, 0.7, 0.85, "Zamknij", zamknij)
 
             self.again = Przycisk(0.2, 0.05, 0.4, 0.85, "Wróć", self.wroc_linie)
 
@@ -773,18 +777,18 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
             self.odwroc.pokaz()
 
 
-###### GŁÓWNY PROGRAM ######
-root = tk.Tk()
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.geometry("1000x1000")
+    root.resizable(width=False, height=False)
 
-root.geometry("1000x1000")
-root.resizable(width=False, height=False)
-canvas = tk.Canvas(root, height=1000, width=1000, bg=BG_COLOR)
-canvas.pack()
+    canvas = tk.Canvas(root, height=1000, width=1000, bg=BG_COLOR)
+    canvas.pack()
 
-gui = GUI()
-gui.ekran_poczatkowy()
+    gui = GUI()
+    gui.ekran_poczatkowy()
 
-root.mainloop()
+    root.mainloop()
 
-c.close()
-conn.close()
+    c.close()
+    conn.close()
