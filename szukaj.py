@@ -636,14 +636,14 @@ class WszystkieTrasy(Wyszukiwanie):
         self.wynik = self.policz(self.gotowe, self.kara)
 
         i = 0
-        a = []
+        trasy = []
         if self.wynik != []:
             while self.wynik[i] == self.wynik[0]:
-                a.append(set(self.gotowe[i]))
+                trasy.append(set(self.gotowe[i]))
                 if i == (len(self.wynik) - 1):
                     break
                 i += 1
-            return a
+            return trasy
         return 0
         # ile = self.wypisz()
         # self.wypiszv2(gotowe, x, ile)
@@ -726,6 +726,8 @@ class Droga:
     def wypisz(self):
         """Prints route of the line"""
         for i in self.droga:
+            if i[0] == 0:
+                print("")
             print(i[0], i[1])
 
 
@@ -755,7 +757,7 @@ if __name__ == '__main__':
             wszystkie.szukaj()
             wszystkie.wypisz()
         if wybor == '3':
-            linia = input("Podaj numer linii")
+            linia = input("Podaj numer linii: ")
             spis_przystankow = Droga()
             spis_przystankow.trasa_linii(linia)
             spis_przystankow.wypisz()
