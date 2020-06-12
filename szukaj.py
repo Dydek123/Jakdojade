@@ -1,14 +1,32 @@
 """ The module contains the functions needed for proper program operation
     Typical usage example:
-    bezposrednie = Bezposrednie()
-    bezposrednie.szukaj()
-    bezposrednie.wypisz()
-    wszystkie = WszystkieTrasy()
-    wszystkie.szukaj()
-    wszystkie.wypisz()
-    trasa = Droga()
-    trasa.trasaLinii(152)
-    trasa.wypisz()
+    wyszukiwarka = Wyszukiwanie()
+
+    while True:
+        print("\nWybierz opcje:")
+        print("1.Polaczenia bezposrednie:")
+        print("2.Najkrótsze połączenia:")
+        print("3.Trasa danej linii:")
+        print("4.Koniec")
+
+        wybor = input()
+        if wybor == '1':
+            bezposrednie = Bezposrednie()
+            bezposrednie.wprowadz_dane()
+            bezposrednie.szukaj_bezposrednie()
+            bezposrednie.wypisz()
+        if wybor == '2':
+            wszystkie = WszystkieTrasy()
+            wszystkie.wprowadz_dane()
+            wszystkie.szukaj()
+            wszystkie.wypisz()
+        if wybor == '3':
+            linia = input("Podaj numer linii")
+            spis_przystankow = Droga()
+            spis_przystankow.trasa_linii(linia)
+            spis_przystankow.wypisz()
+        if wybor == '4':
+            break
 """
 
 import sqlite3
@@ -646,6 +664,9 @@ class WszystkieTrasy(Wyszukiwanie):
             else:
                 break
         ile = i
+
+        print(self.gotowe)
+        print(len(self.gotowe))
         for i in range(ile):
             pierwszy = self.start[0]
             print("\nTrasa nr ", i + 1)
@@ -657,19 +678,21 @@ class WszystkieTrasy(Wyszukiwanie):
                     pierwszy = self.przystanki[j + 1]
             else:
                 print(pierwszy, "-", self.koniec[0])
+
         return i
 
-    def wypiszv2(self, gotowe, trasa, ile):
+    def wypiszv2(self):
         """Prints final results."""
+        ile = self.wypisz()
         for i in range(ile):
             pierwszy = self.start[0]
             print("\nTrasa nr ", i + 1)
-            print("Linią ", gotowe[i][0], " na trasie", end=": ")
-            for j in range(len(gotowe[i]) - 1):
-                if gotowe[i][j] != gotowe[i][j + 1]:
-                    print(pierwszy, "-", trasa[j + 1])
-                    print("Linią ", gotowe[i][j + 1], " na trasie", end=": ")
-                    pierwszy = trasa[j + 1]
+            print("Linią ", self.gotowe[i][0], " na trasie", end=": ")
+            for j in range(len(self.gotowe[i]) - 1):
+                if self.gotowe[i][j] != self.gotowe[i][j + 1]:
+                    print(pierwszy, "-", self.trasa[j + 1])
+                    print("Linią ", self.gotowe[i][j + 1], " na trasie", end=": ")
+                    pierwszy = self.trasa[j + 1]
             else:
                 print(pierwszy, "-", self.koniec[0])
                 break
@@ -705,12 +728,8 @@ class Droga:
             print(i[0], i[1])
 
 
-# Main
-
 graf_polaczen = Graph()
 graf_polaczen.generuj()
-# wygenerowany_graf = GenerujGraf(graf_polaczen)
-# wygenerowany_graf.generuj()
 
 if __name__ == '__main__':
 
@@ -726,7 +745,6 @@ if __name__ == '__main__':
         wybor = input()
         if wybor == '1':
             bezposrednie = Bezposrednie()
-            bezposrednie.sprawdz_id("AGH")
             bezposrednie.wprowadz_dane()
             bezposrednie.szukaj_bezposrednie()
             bezposrednie.wypisz()
@@ -743,6 +761,6 @@ if __name__ == '__main__':
         if wybor == '4':
             break
 
-# Zamkniecie
-# c.close()
-# conn.close()
+    # Zamkniecie
+    c.close()
+    conn.close()
