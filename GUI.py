@@ -1,7 +1,18 @@
 """ The module contains the functions needed for creating GUI
 
     Typical usage example:
-    GUI()
+    root = tk.Tk()
+    root.geometry("1000x1000")
+    root.resizable(width=False, height=False)
+
+    canvas = tk.Canvas(root, height=1000, width=1000, bg=BG_COLOR)
+    canvas.pack()
+
+    gui = GUI()
+    gui.ekran_poczatkowy()
+
+    root.mainloop()
+    gui.zamknij_baze()
 """
 import tkinter as tk
 from tkinter import messagebox
@@ -13,11 +24,7 @@ FILE = "Logo.png"
 BG_COLOR = "#aaaaaa"
 FONT = "Times New Roman"
 
-conn = sqlite3.connect("rozklady.sqlite3")
-c = conn.cursor()
 
-
-####Klasy
 class Logo:
     """Creates logo on main screen."""
 
@@ -129,20 +136,18 @@ class Trasa:
         pierwsza = []
         druga = []
         pierwsza.append([self.trasa_linii[0][0], self.trasa_linii[0][1]])
-        for i in range(1, len(self.trasa_linii)):
+        for przystanek in self.trasa_linii[1:]:
             if j == 0:
-                if self.trasa_linii[i][0] == 0:
+                if przystanek[0] == 0:
                     j += 1
-                    druga.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
+                    druga.append([przystanek[0], przystanek[1]])
                     continue
-                pierwsza.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
+                pierwsza.append([przystanek[0], przystanek[1]])
             if j == 1:
-                if self.trasa_linii[i][0] == 0:
+                if przystanek[0] == 0:
                     j += 1
                 else:
-                    druga.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
-            i += 1
-        i = 0
+                    druga.append([przystanek[0], przystanek[1]])
 
         napis1 = " "
         napis2 = " "
@@ -273,21 +278,13 @@ def zamknij():
         root.quit()
 
 
-def get_value(pole):
-    """Returns bus names."""
-    # Pobranie wartości z pól + kontrola wpisywanych wartości
-    start = pole.get()
-    postoj = c.execute("SELECT Name FROM Stops")
-    for rows in postoj:
-        if start == rows[0]:
-            return start
-    return 0
-
-
 class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami):
     """Creates GUI"""
 
     def __init__(self):
+        self.conn = sqlite3.connect("rozklady.sqlite3")
+        self.c = self.conn.cursor()
+
         self.trasa_linii2 = szukaj.Droga()
         self.istnieje = 0
         self.tmp = 0
@@ -393,11 +390,21 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
         self.trasa_button.destroy()
         self.zdjecie.destroy()
 
+    def get_value(self, pole):
+        """Returns bus names."""
+        # Pobranie wartości z pól + kontrola wpisywanych wartości
+        start = pole.get()
+        postoj = self.c.execute("SELECT Name FROM Stops")
+        for rows in postoj:
+            if start == rows[0]:
+                return start
+        return 0
+
     def pobierz_wartosci_droga(self):
         """Gets bus stops name"""
         # Pobranie wartości + obsługa błędów
-        self.start = get_value(self.poczatkowy)
-        self.end = get_value(self.koncowy)
+        self.start = self.get_value(self.poczatkowy)
+        self.end = self.get_value(self.koncowy)
         self.kara = self.sprawdz_kare()
 
         if self.start == 0:
@@ -432,8 +439,8 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
     def bezposrednie_pobierz_wartosci_droga(self):
         """Gets bus stops name."""
         # Pobranie wartości + obsługa błędów
-        self.start = get_value(self.poczatkowy)
-        self.end = get_value(self.koncowy)
+        self.start = self.get_value(self.poczatkowy)
+        self.end = self.get_value(self.koncowy)
         self.kara = self.sprawdz_kare()
 
         if self.start == 0:
@@ -474,9 +481,7 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
         for i in range(rozmiar):
             gotowe_set[i] = set(gotowe_set[i])
         for i in range(len(self.wynik)):
-            if self.wynik[i] <= tmp:
-                i += 1
-            else:
+            if self.wynik[i] > tmp:
                 break
         # ile = i
         # for i in range(ile):
@@ -484,7 +489,7 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
         #     for j in range(len(self.gotowe[i]) - 1):
         #         if self.gotowe[i][j] != self.gotowe[i][j + 1]:
         #             pierwszy = self.trasa[j + 1]
-        return i-1
+        return i - 1
 
     def dzialanie(self):
         """Searches for routes with total score."""
@@ -722,7 +727,7 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
         self.droga = self.linia.get()
         try:
             self.trasa = int(self.droga)
-            postoj = c.execute("SELECT Name FROM Lines")
+            postoj = self.c.execute("SELECT Name FROM Lines")
             for rows in postoj:
                 if self.droga == rows[0]:
                     self.droga = rows[0]
@@ -748,17 +753,17 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
             self.pierwsza = []
             self.druga = []
             self.pierwsza.append([self.trasa_linii[0][0], self.trasa_linii[0][1]])
-            for i in range(1, len(self.trasa_linii)):
+            for przystanek in self.trasa_linii[1:]:
                 if j == 0:
-                    if self.trasa_linii[i][0] == 0:
+                    if przystanek[0] == 0:
                         j += 1
-                        self.druga.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
+                        self.druga.append([przystanek[0], przystanek[1]])
                         continue
-                    self.pierwsza.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
+                    self.pierwsza.append([przystanek[0], przystanek[1]])
                 if j == 1:
-                    if self.trasa_linii[i][0] == 0:
+                    if przystanek[0] == 0:
                         j += 1
-                    self.druga.append([self.trasa_linii[i][0], self.trasa_linii[i][1]])
+                    self.druga.append([przystanek[0], przystanek[1]])
             i = 0
 
             self.wybor = 2
@@ -776,6 +781,11 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
             self.again.pokaz()
             self.odwroc.pokaz()
 
+    def zamknij_baze(self):
+        """Closes database."""
+        self.c.close()
+        self.conn.close()
+
 
 if __name__ == '__main__':
     root = tk.Tk()
@@ -789,6 +799,4 @@ if __name__ == '__main__':
     gui.ekran_poczatkowy()
 
     root.mainloop()
-
-    c.close()
-    conn.close()
+    gui.zamknij_baze()

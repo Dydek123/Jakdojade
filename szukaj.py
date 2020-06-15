@@ -38,9 +38,6 @@ try:
 except ImportError:
     from pyreadline import Readline as readline
 
-conn = sqlite3.connect("rozklady.sqlite3")
-c = conn.cursor()
-
 
 class BrakPrzystankuException(Exception):
     """Raises when the entered stop does not exist. """
@@ -57,12 +54,14 @@ class KaraZlyPrzedialException(Exception):
         super().__init__()
         self.kara = kara
 
+
 class ZlaFormaArgumentow(Exception):
     """Raises when the entered stop bus id value is not tuple. """
 
     def __init__(self, kara):
         super().__init__()
         self.kara = kara
+
 
 class Completer:
     """Helps to complete bus stop name"""
@@ -90,24 +89,24 @@ def najkrotsza(droga, poczatek, koniec):
     start = poczatek
     end = koniec
     najkrotsza_droga = []
-    ilosc_drog = 1
-    for j in range(0, ilosc_drog):
-        chwilowa_droga = []
-        poczatek = start
-        koniec = end
-        while True:
-            for i in droga:
-                tmp = i
-                if tmp[0] == koniec:
-                    chwilowa_droga.append(tmp[0])
-                    break
-                if tmp[1] == 0:
-                    return [-1, 0]
-            koniec = tmp[1]
-            if koniec == poczatek:
-                chwilowa_droga.append(koniec)
+    # ilosc_drog = 1
+    # for j in range(0, ilosc_drog):
+    chwilowa_droga = []
+    poczatek = start
+    koniec = end
+    while True:
+        for i in droga:
+            tmp = i
+            if tmp[0] == koniec:
+                chwilowa_droga.append(tmp[0])
                 break
-        najkrotsza_droga.append(chwilowa_droga)
+            if tmp[1] == 0:
+                return [-1, 0]
+        koniec = tmp[1]
+        if koniec == poczatek:
+            chwilowa_droga.append(koniec)
+            break
+    najkrotsza_droga.append(chwilowa_droga)
     droga.reverse()
     return najkrotsza_droga
 
@@ -116,9 +115,11 @@ class Graph:
     """Functions in graph."""
 
     def __init__(self):
+        self.conn = sqlite3.connect("rozklady.sqlite3")
+        self.c = self.conn.cursor()
+
         self.graph = collections.defaultdict(dict)
 
-    # funkcja dodajaca krawedz do grafu
     def add_edge(self, przystanek_a, przystanek_b):
         """Adds edge to graph."""
         krawedz = []
@@ -131,7 +132,6 @@ class Graph:
             krawedz.append(przystanek_b)
         self.graph[przystanek_a] = krawedz
 
-    # Funkcja to przeszukiwania algorytmem bfs
     def bfs2(self, node, queue):
         """Algorithm BFS."""
         polaczenia = []
@@ -163,35 +163,36 @@ class Graph:
 
     def generuj(self):
         """Adds right edges to graph."""
-        polaczenia = generuj_krawedzie_grafu()
+        polaczenia = self.generuj_krawedzie_grafu()
         # print(polaczenia)
         # print(len(polaczenia))
         polaczenia = list(polaczenia)
         for i in polaczenia:
             self.add_edge(i[0], i[1])
 
+    def generuj_krawedzie_grafu(self):
+        """Generates graph edges."""
+        polaczenia = set()
+        tmp = []
+        postoj = self.c.execute("SELECT VariantId, No, PointId From Routes")
+        for rows in postoj:
+            tmp.append(rows)
+        # print(tmp)
+        for i in range(len(tmp) - 1):
+            if tmp[i][1] < tmp[i + 1][1]:  # and and tmp[i][0]==tmp[i+1][0]
+                polaczenia.add((tmp[i][2], tmp[i + 1][2]))  # zmienic na add
+        return polaczenia
+
 
 def generuj_wierzchołki_grafu():
     """Generates graph vertices."""
+    conn = sqlite3.connect("rozklady.sqlite3")
+    c = conn.cursor()
     wierzcholki = set()
     postoj = c.execute("SELECT Id From Points")
     for rows in postoj:
         wierzcholki.add(rows[0])
     return wierzcholki
-
-
-def generuj_krawedzie_grafu():
-    """Generates graph edges."""
-    polaczenia = set()
-    tmp = []
-    postoj = c.execute("SELECT VariantId, No, PointId From Routes")
-    for rows in postoj:
-        tmp.append(rows)
-    # print(tmp)
-    for i in range(len(tmp) - 1):
-        if tmp[i][1] < tmp[i + 1][1]:  # and and tmp[i][0]==tmp[i+1][0]
-            polaczenia.add((tmp[i][2], tmp[i + 1][2]))  # zmienic na add
-    return polaczenia
 
 
 # class GenerujGraf():
@@ -208,36 +209,6 @@ def generuj_krawedzie_grafu():
 #
 #         for i in polaczenia:
 #             self.graf.add_edge(i[0], i[1])
-
-
-# Klasa odpowiedzialna za funkcjonalność
-def wszystkie_przystanki():
-    """Returns all bus stops in database."""
-    przystanki = []
-    postoj = c.execute("SELECT Name FROM Stops")
-    for rows in postoj:
-        przystanki.append(rows[0])
-    return przystanki
-
-
-def wprowadz_przystanek():
-    """Provides correct stop input."""
-    lista_przystankow = wszystkie_przystanki()
-    readline.parse_and_bind('tab: complete')
-    readline.set_completer(Completer(lista_przystankow).complete)
-    readline.set_completer_delims('')
-    while True:
-        try:
-            print("Przystanek:", end=" ")
-            przystanek = (input(),)
-            postoj = c.execute("SELECT Name FROM Stops")
-            for rows in postoj:
-                if przystanek[0] == rows[0]:
-                    return przystanek
-            raise BrakPrzystankuException(przystanek)
-        except BrakPrzystankuException:
-            print("Przystanek {} nie istnieje, spróbuj ponownie".format(przystanek[0]))
-
 
 def wybierz_kare():
     """Provides correct penalty input."""
@@ -258,22 +229,51 @@ class Wyszukiwanie():
     """Searches routes between two bus stops."""
 
     def __init__(self):
+        self.conn = sqlite3.connect("rozklady.sqlite3")
+        self.c = self.conn.cursor()
+
         self.start = ("Biprostal",)  # self.wprowadz_przystanek()
         self.koniec = ("AGH",)  # self.wprowadz_przystanek()
         self.kara = 2  # self.wybierz_kare()
 
+    def wszystkie_przystanki(self):
+        """Returns all bus stops in database."""
+        przystanki = []
+        postoj = self.c.execute("SELECT Name FROM Stops")
+        for rows in postoj:
+            przystanki.append(rows[0])
+        return przystanki
+
+    def wprowadz_przystanek(self):
+        """Provides correct stop input."""
+        lista_przystankow = self.wszystkie_przystanki()
+        readline.parse_and_bind('tab: complete')
+        readline.set_completer(Completer(lista_przystankow).complete)
+        readline.set_completer_delims('')
+        while True:
+            try:
+                print("Przystanek:", end=" ")
+                przystanek = (input(),)
+                postoj = self.c.execute("SELECT Name FROM Stops")
+                for rows in postoj:
+                    if przystanek[0] == rows[0]:
+                        return przystanek
+                raise BrakPrzystankuException(przystanek)
+            except BrakPrzystankuException:
+                print("Przystanek {} nie istnieje, spróbuj ponownie".format(przystanek[0]))
+
     def wprowadz_dane(self):
         """Enters data."""
-        self.start = wprowadz_przystanek()
-        self.koniec = wprowadz_przystanek()
+        self.start = self.wprowadz_przystanek()
+        self.koniec = self.wprowadz_przystanek()
         self.kara = wybierz_kare()
 
     def sprawdz_id(self, przystanek):
         """Transform stop name to stop ID."""
         try:
-            postoj = c.execute("SELECT StopID FROM Points"
-                               " WHERE StopName=? "
-                               "order by StopID", przystanek)
+            postoj = self.c.execute("SELECT StopID FROM Points"
+                                    " WHERE StopName=? "
+                                    "order by StopID", przystanek)
             for rows in postoj:
                 cos = rows[0]
             przystanek = (cos,)
@@ -286,7 +286,7 @@ class Wyszukiwanie():
     def sprawdz_point_id(self, przystanek_id):
         """Checks available points to stop."""
         try:
-            postoj = c.execute("SELECT ID From Points WHERE StopId=?", przystanek_id)
+            postoj = self.c.execute("SELECT ID From Points WHERE StopId=?", przystanek_id)
             point_id = [rows[0] for rows in postoj]
             if not point_id:
                 raise BrakPrzystankuException("Bus stop does not exists.")
@@ -294,12 +294,11 @@ class Wyszukiwanie():
         except (UnboundLocalError, ValueError, sqlite3.ProgrammingError):
             raise ZlaFormaArgumentow("Not a valid bus stop id")
 
-
     def point_id_to_stop_name(self, przystanek_id):
         """Swaps point id to stop name"""
         try:
             point_id = (przystanek_id,)
-            postoj = c.execute("SELECT StopName From Points WHERE Id=?", point_id)
+            postoj = self.c.execute("SELECT StopName From Points WHERE Id=?", point_id)
             stop_name = [rows[0] for rows in postoj]
             if not stop_name:
                 raise BrakPrzystankuException("Not a valid bus stop id")
@@ -312,7 +311,8 @@ class Wyszukiwanie():
         try:
             variant_id = []
             for i in point_id:
-                postoj = c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=?", (i,))
+                postoj = self.c.execute("SELECT VariantID FROM StopDepartures WHERE PointID=?",
+                                        (i,))
                 for row in postoj:
                     variant_id.append(row[0])
             variant_id = list(set(variant_id))
@@ -322,12 +322,13 @@ class Wyszukiwanie():
         except (TypeError, ValueError, sqlite3.ProgrammingError, sqlite3.InterfaceError):
             raise ZlaFormaArgumentow("Not a valid bus stop point id")
 
-    def sprawdz_both_variant_id(self, start_variant_id, end_variant_id):
+    @staticmethod
+    def sprawdz_both_variant_id(start_variant_id, end_variant_id):
         """Returns connection combinations."""
         try:
-            both_variant_id = [start_variant_id[i] for i in range(0, len(start_variant_id))
-                               for j in range(0, len(end_variant_id))
-                               if start_variant_id[i] == end_variant_id[j]]
+            both_variant_id = [i for i in start_variant_id
+                               for j in end_variant_id
+                               if i == j]
             return both_variant_id
         except (TypeError, ValueError, sqlite3.ProgrammingError, sqlite3.InterfaceError):
             raise ZlaFormaArgumentow("Not a valid start or end variant id")
@@ -339,7 +340,7 @@ class Wyszukiwanie():
             both_variant_id = variant_id[0]
             for i in both_variant_id:
                 variant_id = (i,)
-                trasa = c.execute("SELECT * FROM Variants Where ID=?", variant_id)
+                trasa = self.c.execute("SELECT * FROM Variants Where ID=?", variant_id)
                 for row in trasa:
                     both_variant_line.append(row[1])
             both_variant_line = list(set(both_variant_line))
@@ -347,7 +348,8 @@ class Wyszukiwanie():
         except TypeError:
             raise ZlaFormaArgumentow("Not a valid variant id")
 
-    def zamien_elementy_int_na_str(self, int_list):
+    @staticmethod
+    def zamien_elementy_int_na_str(int_list):
         """Converts elements of type int to string."""
         str_list = [str(i) for i in int_list]
         return str_list
@@ -359,8 +361,8 @@ class Wyszukiwanie():
             for j in both_variant_id:
                 variant_id = j
                 for i in point_id:
-                    trasa = c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?",
-                                      (i, variant_id))
+                    trasa = self.c.execute("SELECT No FROM Routes WHERE PointID=? and VariantID=?",
+                                           (i, variant_id))
                     for row in trasa:
                         stop_no.append(row[0])
             return stop_no
@@ -528,6 +530,11 @@ class Wyszukiwanie():
             wynik.append(suma)
         return wynik
 
+    def zamknij_baze(self):
+        """Closes database."""
+        self.c.close()
+        self.conn.close()
+
 
 class Bezposrednie(Wyszukiwanie):
     """Searches for direct routes between two bus stop."""
@@ -551,8 +558,8 @@ class Bezposrednie(Wyszukiwanie):
 
     def wprowadz_dane(self):
         """Enters data."""
-        self.start = wprowadz_przystanek()
-        self.koniec = wprowadz_przystanek()
+        self.start = Wyszukiwanie.wprowadz_przystanek(self)
+        self.koniec = Wyszukiwanie.wprowadz_przystanek(self)
 
     def szukaj_bezposrednie(self):
         """Searches for direct routes."""
@@ -659,15 +666,10 @@ class WszystkieTrasy(Wyszukiwanie):
         my_string = "Łączne wyniki z karą za przesiadkę= {} na trasie {} - {}:"
         print(my_string.format(self.kara, self.start[0], self.koniec[0]))
         for i in range(len(self.wynik)):
-            if self.wynik[i] <= tmp:
-                # print("Liniami: ", gotoweSet[i], wynik[i])
-                i += 1
-            else:
+            if self.wynik[i] > tmp:
                 break
         ile = i
 
-        print(self.gotowe)
-        print(len(self.gotowe))
         for i in range(ile):
             pierwszy = self.start[0]
             print("\nTrasa nr ", i + 1)
@@ -703,6 +705,9 @@ class Droga:
     """Searches for all stops on a given bus line. """
 
     def __init__(self):
+        self.conn = sqlite3.connect("rozklady.sqlite3")
+        self.c = self.conn.cursor()
+
         self.droga = []
         self.linia = ()
 
@@ -710,15 +715,15 @@ class Droga:
         """Returns tuple of stop number and stop name"""
         self.linia = (nr_linii,)
         variant_id = []
-        postoj = c.execute("SELECT Id FROM Variants WHERE LineName=?", self.linia)
+        postoj = self.c.execute("SELECT Id FROM Variants WHERE LineName=?", self.linia)
         for row in postoj:
             variant_id.append(row[0])
         variant_id = list(set(variant_id))
         # print(VariantID)
 
         for i in enumerate(variant_id):
-            postoj = c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?",
-                               (variant_id[i[0]],))
+            postoj = self.c.execute("SELECT No, StopName FROM Routes  WHERE VariantID=?",
+                                    (variant_id[i[0]],))
             for row in postoj:
                 self.droga.append([row[0], row[1]])
         return self.droga
@@ -730,14 +735,17 @@ class Droga:
                 print("")
             print(i[0], i[1])
 
+    def zamknij_baze(self):
+        """Closes database."""
+        self.c.close()
+        self.conn.close()
+
 
 graf_polaczen = Graph()
 graf_polaczen.generuj()
 
-if __name__ == '__main__':
 
-    wyszukiwarka = Wyszukiwanie()
-
+def main():
     while True:
         print("\nWybierz opcje:")
         print("1.Polaczenia bezposrednie:")
@@ -751,19 +759,24 @@ if __name__ == '__main__':
             bezposrednie.wprowadz_dane()
             bezposrednie.szukaj_bezposrednie()
             bezposrednie.wypisz()
+            bezposrednie.zamknij_baze()
+
         if wybor == '2':
             wszystkie = WszystkieTrasy()
             wszystkie.wprowadz_dane()
             wszystkie.szukaj()
             wszystkie.wypisz()
+            wszystkie.zamknij_baze()
+
         if wybor == '3':
             linia = input("Podaj numer linii: ")
             spis_przystankow = Droga()
             spis_przystankow.trasa_linii(linia)
             spis_przystankow.wypisz()
+            spis_przystankow.zamknij_baze()
+
         if wybor == '4':
             break
 
-    # Zamkniecie
-    c.close()
-    conn.close()
+if __name__ == '__main__':
+    main()

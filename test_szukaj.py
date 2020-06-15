@@ -110,25 +110,23 @@ class WyszukiwainieTest(unittest.TestCase):
         polaczenia.start = ("Biprostal",)
         polaczenia.koniec = ("AGH",)
         lista_przystankow = polaczenia.szukaj()
-        for i in lista_przystankow:
-            self.assertIn(i, [{'24', '708'},
-                              {'713', '708'},
-                              {'704', '708'},
-                              {'664', '708'},
-                              {'708', '4'},
-                              {'8', '708'},
-                              {'13', '708'},
-                              {'708', '14'},
-                              {'708', '44'},
-                              {'64', '708'}])
+        self.assertCountEqual(lista_przystankow, [{'24', '708'},
+                                                  {'713', '708'},
+                                                  {'704', '708'},
+                                                  {'664', '708'},
+                                                  {'708', '4'},
+                                                  {'8', '708'},
+                                                  {'13', '708'},
+                                                  {'708', '14'},
+                                                  {'708', '44'},
+                                                  {'64', '708'}])
 
     def test_szukaj_bezposrednie(self):
         polaczenia = szukaj.Bezposrednie()
         polaczenia.start = ("Politechnika",)
         polaczenia.koniec = ("Miasteczko Studenckie AGH",)
         lista_przystankow = polaczenia.szukaj_bezposrednie()
-        for i in lista_przystankow[0]:
-            self.assertIn(i, ['501', '511', '208'])
+        self.assertCountEqual(lista_przystankow[0], ['501', '511', '208'])
 
 
 if __name__ == '__main__':
