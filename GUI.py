@@ -476,20 +476,15 @@ class GUI(Trasa, szukaj.WszystkieTrasy, szukaj.Bezposrednie, DrogaZPrzystankami)
         """Returns how many results are."""
         gotowe_set = copy.deepcopy(self.gotowe)
         tmp = self.wynik[0]
-        i = 0
+        ile = 0
         rozmiar = len(gotowe_set)
         for i in range(rozmiar):
             gotowe_set[i] = set(gotowe_set[i])
-        for i in range(len(self.wynik)):
-            if self.wynik[i] > tmp:
-                break
-        # ile = i
-        # for i in range(ile):
-        #     pierwszy = self.start[0]
-        #     for j in range(len(self.gotowe[i]) - 1):
-        #         if self.gotowe[i][j] != self.gotowe[i][j + 1]:
-        #             pierwszy = self.trasa[j + 1]
-        return i - 1
+
+        while self.wynik[ile] <= tmp:
+            ile += 1
+
+        return ile - 1
 
     def dzialanie(self):
         """Searches for routes with total score."""

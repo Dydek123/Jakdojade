@@ -665,10 +665,11 @@ class WszystkieTrasy(Wyszukiwanie):
             gotowe_set[i] = set(gotowe_set[i])
         my_string = "Łączne wyniki z karą za przesiadkę= {} na trasie {} - {}:"
         print(my_string.format(self.kara, self.start[0], self.koniec[0]))
-        for i in range(len(self.wynik)):
-            if self.wynik[i] > tmp:
-                break
-        ile = i
+
+        ile = 0
+        while self.wynik[ile] <= tmp:
+            ile += 1
+
 
         for i in range(ile):
             pierwszy = self.start[0]
