@@ -1,79 +1,48 @@
-# Jakdojade
+# Jakdojade lite - Search engine for public transport connections for Krakow
+Application is based on MPK Kraków database to display timetables for a given line and find direct or shortest public transport connections between two stops with score(sum of intermediate bus stops and penalty for each changing the bus/tram).
 
-Projekt – Wyszukiwarka połączeń komunikacji miejskiej dla miasta Kraków
+## Table of contents
+* [Annotation](#annotation)
+* [Technologies](#technologies)
+* [Setup](#setup)
+* [Features](#features)
 
-#Założenia projektowe kodu:
+## Annotation
+Database does not include any data on the times of departure of buses / trams from the stops, therefore the selection of the shortest route is based on the number of stops between two points, instead of driving time. To make the application more realistic (despite database limitations) I introduced a 'penalty' for each changing the bus/tram to simulate the waiting on the stop.
 
-Głównym zadaniem projektu jest wyszukiwanie bezpośrednich oraz najkrótszych połączeń komunikacji miejskiej oraz znalezienie rozkładów jazdy danej linii. Całość projektu opiera się na bazie danych MPK Kraków. Wyszukiwanie najkrótszych tras będzie opierało się na zliczaniu przystanków pomiędzy dwoma punktami i wybraniu trasy z najmniejszą liczbą przystanków.
+## Technologies
+* Python 3 (Tkinter)
+* SQLite3
 
-#Ogólny opis kodu:
+## Setup
+### Intall necessary libraries (if needed)
+```
+$ pip install -r requirements.txt
+```
+### Run application in GUI mode
+```
+$ python GUI.py
+```
+### Run application in console mode
+```
+$ python szukaj.py
+```
 
-Połączenia bezpośrednie:
-Algorytm wyszukiwania połączeń bezpośrednich opiera się wyłącznie na tworzeniu kolejnych zapytań do bazy danych. Użytkownik wprowadza przystanek startowy i końcowy jako dane. Po wykonaniu odpowiednich funkcji, na ekran zostaje wypisana liczba znalezionych tras bezpośrednich oraz odpowiadające tym trasom numery linii.
+## Features
+### Direct connections
+To find direct connection application uses only a few database queries for the start and end bus/tram stops that user have entered
+<p align="center">
+  <img src="README-gifs/Direct.gif" />
+</p>
 
-Najkrótsze trasy:
-Na początku programu tworzony jest graf dostępnych połączeń pomiędzy przystankami autobusowymi. Graf zostaje wygenerowany tylko raz przy uruchomieniu programu. Jako krawędzie grafu zapisuję możliwe połączenia pomiędzy dwoma najbliższymi przystankami . Następnie, po wprowadzeniu danych przez użytkownika, za pomocą algorytmu BFS zostają znalezione najkrótsze trasy pomiędzy wprowadzonymi przystankami.
+### Shortest connections:
+At the beginning of the program, a graph of available connections between two stops is generated (only once when application is started). Possible connections between two closest stops are edges of the graph. Then BFS algorithm finds the shortest routes between the entered stops
+<p align="center">
+  <img src="README-gifs/Shortest.gif" />
+</p>
 
-Rozkład linii
-Jako dane użytkownik wprowadza numer linii, dla której ma zostać wyświetlona trasa. Za pomocą zapytań do bazy danych znajduję wszystkie przystanki pośrednie dla danej linii i wypisuję je na ekran
-
-Co udało się zrobić, z czym były problemy
-
-Udało się zrealizować wszystkie główne założenia programu, jednak zostały napotkane pewne problemy:
-
-• W bazie danych brak jest jakichkolwiek danych odnośnie czasów odjazdu autobusów/tramwajów z przystanków, dlatego wybieranie najkrótszej trasy, odbywa się na podstawie ilości przystanków pomiędzy przystankami, zamiast czasu jazdy.
-
-• Przy wyszukiwaniu najkrótszych tras, zdarza się, że ilość znalezionych kombinacji połączeń jest ogromna i uniemożliwia sensowne przeglądanie wyników, dlatego na ekran wypisywane zostają jedynie połączenia z najmniejszą liczbą przesiadek.
-
-• Okazało się, porównywanie znalezionych wyników na różnych trasach z uwzględnieniem kary za przesiadkę trwała zbyt długo, dlatego postanowiłem ograniczyć wyszukiwanie tras do jednej najkrótszej.
-
-Brak zauważonych problemów z testami.
-
-Linki do istotnych fragmentów kodu:
-
-List comprehensions :
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L290
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L329-L331
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L376-L377
-
-Klasy:
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L228-L536
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L705-L742
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L539-L593
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L596-L702
-
-
-Wyjątki:
-
-• Zdefiniowane własnych klas wyjątku:
-
-https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L42-L63
-
-• Rzucanie/łapanie wyjątków
-
-https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L213-L225
-
-https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L247-L263
-
-Podział na moduły:
-
-• https://github.com/Dydek123/Jakdojade/blob/master/szukaj.py
-
-• https://github.com/Dydek123/Jakdojade/blob/master/GUI.py
-
-Podpowiedzi przy wprowadzaniu przystanków(po naciśnięciu przycisku tab, funkcja może nie działać w przypadku uruchamiania przez programy np. PyCharm)
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L66-L82
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L247-L263
-
-Generowanie grafu i algorytm BFS
-
-• https://github.com/Dydek123/Jakdojade/blob/c3fc5864b620aea365b3456332ccb2686b400f4e/szukaj.py#L85-L184
+### Timetables
+Using database queries application finds alle the intermediate stops on the bus line and display them on the screen
+<p align="center">
+  <img src="README-gifs/Timetable.gif" />
+</p>
